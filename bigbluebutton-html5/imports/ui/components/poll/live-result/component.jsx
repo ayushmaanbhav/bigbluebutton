@@ -165,10 +165,19 @@ class LiveResult extends PureComponent {
       waiting = respondedCount !== userAnswers.length && currentPoll;
     }
 
+    let question = '';
+    if (currentPoll) {
+      question = currentPoll.question ? currentPoll.question : '';
+    }
+
     return (
       <div>
         <div className={styles.stats}>
-          {pollStats}
+          {question ? <div className={styles.textCenter}><b>{question}</b></div> : null}
+          {question ? <br /> : null}
+          <div className={styles.statsSpan}>
+            {pollStats}
+          </div>
         </div>
         <div className={styles.status}>
           {waiting
@@ -233,6 +242,7 @@ LiveResult.propTypes = {
   currentPoll: PropTypes.oneOfType([
     PropTypes.arrayOf(Object),
     PropTypes.shape({
+      question: PropTypes.string,
       answers: PropTypes.arrayOf(PropTypes.object),
       users: PropTypes.arrayOf(PropTypes.string),
     }),

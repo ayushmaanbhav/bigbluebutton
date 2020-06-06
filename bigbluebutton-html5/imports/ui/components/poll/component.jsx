@@ -50,6 +50,10 @@ const intlMessages = defineMessages({
     id: 'app.poll.customPlaceholder',
     description: 'custom poll input field placeholder text',
   },
+  questionPlaceholder: {
+    id: 'app.poll.questionPlaceholder',
+    description: 'custom poll question field placeholder text',
+  },
   noPresentationSelected: {
     id: 'app.poll.noPresentationSelected',
     description: 'no presentation label',
@@ -95,9 +99,11 @@ class Poll extends Component {
       customPollReq: false,
       isPolling: false,
       customPollValues: [],
+      customQuestion: ''
     };
 
     this.inputEditor = [];
+    this.customQuestion = '';
 
     this.toggleCustomFields = this.toggleCustomFields.bind(this);
     this.renderQuickPollBtns = this.renderQuickPollBtns.bind(this);
@@ -138,15 +144,23 @@ class Poll extends Component {
     this.setState({ customPollValues: this.inputEditor });
   }
 
+  handleQuestionChange(event) {
+    const customQuestion = event.target.value.replace(/\s{2,}/g, ' ').trim();
+    this.customQuestion = customQuestion === '' ? '' : customQuestion;
+    this.setState({ customQuestion: this.customQuestion });
+  }
+
   handleBackClick() {
     const { stopPoll } = this.props;
     Session.set('resetPollPanel', false);
 
     stopPoll();
     this.inputEditor = [];
+    this.customQuestion = '';
     this.setState({
       isPolling: false,
       customPollValues: this.inputEditor,
+      customQuestion: this.customQuestion,
     }, document.activeElement.blur());
   }
 
@@ -196,7 +210,7 @@ class Poll extends Component {
           onClick={() => {
             if (this.inputEditor.length > 0) {
               Session.set('pollInitiated', true);
-              this.setState({ isPolling: true }, () => startCustomPoll('custom', _.compact(this.inputEditor)));
+              this.setState({ isPolling: true }, () => startCustomPoll('custom', _.compact(this.inputEditor), this.customQuestion));
             }
           }}
           label={intl.formatMessage(intlMessages.startCustomLabel)}
@@ -211,10 +225,23 @@ class Poll extends Component {
 
   renderInputFields() {
     const { intl } = this.props;
-    const { customPollValues } = this.state;
+    const { customPollValues, customQuestion } = this.state;
     let items = [];
 
-    items = _.range(1, MAX_CUSTOM_FIELDS + 1).map((ele, index) => {
+    items[0] = (
+      <div key={`custom-poll-question`} className={styles.pollQuestion}>
+        <input
+          aria-label={intl.formatMessage(intlMessages.questionPlaceholder)}
+          placeholder={intl.formatMessage(intlMessages.questionPlaceholder)}
+          className={styles.input}
+          onChange={event => this.handleQuestionChange(event)}
+          defaultValue={customQuestion}
+          maxLength={MAX_INPUT_CHARS}
+        />
+      </div>
+    );
+
+    items = items.concat(_.range(1, MAX_CUSTOM_FIELDS + 1).map((ele, index) => {
       const id = index;
       return (
         <div key={`custom-poll-${id}`} className={styles.pollInput}>
@@ -230,7 +257,7 @@ class Poll extends Component {
           />
         </div>
       );
-    });
+    }));
 
     return items;
   }

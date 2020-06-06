@@ -208,6 +208,7 @@
     "app.poll.closeLabel": "Close",
     "app.poll.waitingLabel": "Waiting for responses ({0}/{1})",
     "app.poll.ariaInputCount": "Custom poll option {0} of {1}",
+    "app.poll.questionPlaceholder": "Add poll question",
     "app.poll.customPlaceholder": "Add poll option",
     "app.poll.noPresentationSelected": "No presentation selected! Please select one.",
     "app.poll.clickHereToSelect": "Click here to select",

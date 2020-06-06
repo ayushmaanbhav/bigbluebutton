@@ -9,6 +9,7 @@ export default function addPoll(meetingId, requesterId, poll) {
   check(meetingId, String);
   check(poll, {
     id: String,
+    question: Match.OneOf(String, null, undefined),
     answers: [
       {
         id: Number,

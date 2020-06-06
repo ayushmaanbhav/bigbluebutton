@@ -15,7 +15,7 @@ object Polls {
                             lm: LiveMeeting): Option[SimplePollOutVO] = {
     def createPoll(pollId: String, numRespondents: Int): Option[Poll] = {
       for {
-        poll <- PollFactory.createPoll(pollId, pollType, numRespondents, None)
+        poll <- PollFactory.createPoll(pollId, pollType, numRespondents, None, None)
       } yield {
         lm.polls.save(poll)
         poll
@@ -129,11 +129,11 @@ object Polls {
   }
 
   def handleStartCustomPollReqMsg(state: MeetingState2x, requesterId: String, pollId: String, pollType: String,
-                                  answers: Seq[String], lm: LiveMeeting): Option[SimplePollOutVO] = {
+                                  answers: Seq[String], questionText: String, lm: LiveMeeting): Option[SimplePollOutVO] = {
 
     def createPoll(pollId: String, numRespondents: Int): Option[Poll] = {
       for {
-        poll <- PollFactory.createPoll(pollId, pollType, numRespondents, Some(answers))
+        poll <- PollFactory.createPoll(pollId, pollType, numRespondents, Some(answers), Some(questionText))
       } yield {
         lm.polls.save(poll)
         poll
@@ -190,6 +190,7 @@ object Polls {
     val shape = new scala.collection.mutable.HashMap[String, Object]()
     shape += "numRespondents" -> new Integer(result.numRespondents)
     shape += "numResponders" -> new Integer(result.numResponders)
+    if (result.question.isDefined) shape += "question" -> new String(result.question.get)
     shape += "type" -> WhiteboardKeyUtil.POLL_RESULT_TYPE
     shape += "id" -> result.id
     shape += "status" -> WhiteboardKeyUtil.DRAW_END_STATUS
@@ -203,7 +204,8 @@ object Polls {
 
     // Hardcode poll result display location for now to display result
     // in bottom-right corner.
-    val shapeHeight = 6.66 * answers.size
+    val extraLine = if (result.question.isDefined) 1 else 0
+    val shapeHeight = 6.66 * (answers.size + extraLine)
     val mapA = List(66.toFloat, 100 - shapeHeight, 34.toFloat, shapeHeight)
 
     shape += "points" -> mapA
@@ -397,19 +399,19 @@ object PollFactory {
     ans
   }
 
-  private def processCustomPollType(qType: String, multiResponse: Boolean, answers: Option[Seq[String]]): Option[Question] = {
+  private def processCustomPollType(qType: String, multiResponse: Boolean, answers: Option[Seq[String]], questionText: Option[String]): Option[Question] = {
     var questionOption: Option[Question] = None
 
     answers.foreach { ans =>
       val someAnswers = buildAnswers(ans)
-      val question = new Question(0, PollType.CustomPollType, multiResponse, None, someAnswers)
+      val question = new Question(0, PollType.CustomPollType, multiResponse, questionText, someAnswers)
       questionOption = Some(question)
     }
 
     questionOption
   }
 
-  private def createQuestion(qType: String, answers: Option[Seq[String]]): Option[Question] = {
+  private def createQuestion(qType: String, answers: Option[Seq[String]], questionText: Option[String]): Option[Question] = {
 
     val qt = qType.toUpperCase()
     var questionOption: Option[Question] = None
@@ -419,7 +421,7 @@ object PollFactory {
     } else if (qt.matches(PollType.TrueFalsePollType)) {
       questionOption = Some(processTrueFalsePollType(qt))
     } else if (qt.matches(PollType.CustomPollType)) {
-      questionOption = processCustomPollType(qt, false, answers)
+      questionOption = processCustomPollType(qt, false, answers, questionText)
     } else if (qt.startsWith(PollType.LetterPollType)) {
       questionOption = processLetterPollType(qt, false)
     } else if (qt.startsWith(PollType.NumberPollType)) {
@@ -429,10 +431,10 @@ object PollFactory {
     questionOption
   }
 
-  def createPoll(id: String, pollType: String, numRespondents: Int, answers: Option[Seq[String]]): Option[Poll] = {
+  def createPoll(id: String, pollType: String, numRespondents: Int, answers: Option[Seq[String]], questionText: Option[String]): Option[Poll] = {
     var poll: Option[Poll] = None
 
-    createQuestion(pollType, answers) match {
+    createQuestion(pollType, answers, questionText) match {
       case Some(question) => {
         poll = Some(new Poll(id, Array(question), numRespondents, None))
       }
@@ -496,11 +498,11 @@ class Poll(val id: String, val questions: Array[Question], val numRespondents: I
   }
 
   def toSimplePollOutVO(): SimplePollOutVO = {
-    new SimplePollOutVO(id, questions(0).toSimpleAnswerOutVO())
+    new SimplePollOutVO(id, questions(0).toSimpleAnswerOutVO(), questions(0).text)
   }
 
   def toSimplePollResultOutVO(): SimplePollResultOutVO = {
-    new SimplePollResultOutVO(id, questions(0).toSimpleVotesOutVO(), numRespondents, _numResponders)
+    new SimplePollResultOutVO(id, questions(0).toSimpleVotesOutVO(), questions(0).text, numRespondents, _numResponders)
   }
 }
 

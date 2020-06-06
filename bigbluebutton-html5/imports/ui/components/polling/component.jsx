@@ -42,7 +42,7 @@ class Polling extends Component {
       handleVote,
       pollAnswerIds,
     } = this.props;
-    const { stackOptions, answers } = poll;
+    const { stackOptions, answers, question } = poll;
     const pollAnswerStyles = {
       [styles.pollingAnswers]: true,
       [styles.removeColumns]: answers.length === 1,
@@ -59,7 +59,7 @@ class Polling extends Component {
           role="alert"
         >
           <div className={styles.pollingTitle}>
-            {intl.formatMessage(intlMessages.pollingTitleLabel)}
+            {question ? question : intl.formatMessage(intlMessages.pollingTitleLabel)}
           </div>
           <div className={cx(pollAnswerStyles)}>
             {poll.answers.map((pollAnswer) => {
@@ -115,6 +115,7 @@ Polling.propTypes = {
   handleVote: PropTypes.func.isRequired,
   poll: PropTypes.shape({
     pollId: PropTypes.string.isRequired,
+    question: PropTypes.string,
     answers: PropTypes.arrayOf(PropTypes.shape({
       id: PropTypes.number.isRequired,
       key: PropTypes.string.isRequired,

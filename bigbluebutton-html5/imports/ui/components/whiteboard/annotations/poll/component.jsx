@@ -58,7 +58,7 @@ class PollDrawComponent extends Component {
     // rendering / rerendering the text objects
 
     const { annotation } = this.props;
-    const { points, result } = annotation;
+    const { points, result, question } = annotation;
     const { slideWidth, slideHeight, intl } = this.props;
 
     // x1 and y1 - coordinates of the top left corner of the annotation
@@ -131,6 +131,8 @@ class PollDrawComponent extends Component {
 
       textArray.push(_tempArray);
     }
+
+    if (question) textArray.push([question, '', '', arrayLength]);
 
     // calculating the data for the inner rectangle
     const innerWidth = width * 0.95;
@@ -263,7 +265,7 @@ class PollDrawComponent extends Component {
     let maxLeftWidth = 0;
     let maxRightWidth = 0;
     maxLineHeight = 0;
-    for (let i = 0; i < textArray.length; i += 1) {
+    for (let i = 0; i < annotation.result.length; i += 1) {
       const key = `${annotation.id}_key_${i}`;
       const percent = `${annotation.id}_percent_${i}`;
       const keySizes = this[key].getBBox();
@@ -358,8 +360,26 @@ class PollDrawComponent extends Component {
       + maxLeftWidth) + maxRightWidth) + maxBarWidth + 1);
 
     let yNumVotes = (innerRect.y + verticalPadding) - magicNumber;
+
+    let questionText = undefined;
+    if (annotation.question) {
+      questionText = {
+        key: `${annotation.id}_${textArray[annotation.result.length][3]}`,
+        keyColumn: {
+          keyString: textArray[annotation.result.length][0],
+          xLeft,
+          yLeft,
+        },
+      };
+      
+      yBar = yBar + barHeight + verticalPadding;
+      yLeft = yLeft + barHeight + verticalPadding;
+      yRight = yRight + barHeight + verticalPadding;
+      yNumVotes = yNumVotes + barHeight + verticalPadding;
+    }
+
     const extendedTextArray = [];
-    for (let i = 0; i < textArray.length; i += 1) {
+    for (let i = 0; i < annotation.result.length; i += 1) {
       let barWidth;
       if (maxNumVotes === 0 || annotation.result[i].numVotes === 0) {
         barWidth = 1;
@@ -440,6 +460,27 @@ class PollDrawComponent extends Component {
           fill={backgroundColor}
           strokeWidth={thickness}
         />
+        {questionText
+          ? <text
+              x={innerRect.x}
+              y={innerRect.y}
+              fill="#333333"
+              fontFamily="Arial"
+              fontSize={calcFontSize}
+              textAnchor={isRTL ? 'end' : 'start'}
+            >
+              <tspan
+                x={questionText.keyColumn.xLeft}
+                y={questionText.keyColumn.yLeft}
+                dy={maxLineHeight / 2}
+                key={`${questionText.key}_key`}
+                className={styles.outline}
+              >
+                {questionText.keyColumn.keyString}
+              </tspan>
+            </text>
+          : null
+        }
         <text
           x={innerRect.x}
           y={innerRect.y}
@@ -609,6 +650,7 @@ PollDrawComponent.propTypes = {
   annotation: PropTypes.shape({
     id: PropTypes.string.isRequired,
     points: PropTypes.arrayOf(PropTypes.number).isRequired,
+    question: PropTypes.string,
     result: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.number.isRequired,

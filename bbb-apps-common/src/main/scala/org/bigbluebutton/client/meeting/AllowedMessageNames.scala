@@ -74,7 +74,7 @@ object AllowedMessageNames {
     SendCursorPositionPubMsg.NAME,
 
     // Polling Messages
-    StartCustomPollReqMsg.NAME,
+    Msg.NAME,
     StartPollReqMsg.NAME,
     StopPollReqMsg.NAME,
     RespondToPollReqMsg.NAME,

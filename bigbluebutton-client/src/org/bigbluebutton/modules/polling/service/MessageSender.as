@@ -27,10 +27,10 @@ package org.bigbluebutton.modules.polling.service
   public class MessageSender {
     private static const LOGGER:ILogger = getClassLogger(MessageSender);
 
-    public function startCustomPoll(pollId:String, pollType: String, answers:Array):void {
+    public function startCustomPoll(pollId:String, pollType: String, answers:Array, question:String):void {
       var message:Object = {
         header: {name: "StartCustomPollReqMsg", meetingId: UsersUtil.getInternalMeetingID(), userId: UsersUtil.getMyUserID()},
-        body: {requesterId: UsersUtil.getMyUserID(), pollId: pollId, pollType: pollType, answers: answers}
+        body: {requesterId: UsersUtil.getMyUserID(), pollId: pollId, pollType: pollType, answers: answers, question: question}
       };
 
       var _nc:ConnectionManager = BBB.initConnectionManager();

@@ -24,6 +24,7 @@ const mapPolls = () => {
 
   return {
     poll: {
+      question: poll.question,
       answers: poll.answers,
       pollId: poll.id,
       stackOptions,

@@ -7,6 +7,7 @@ export default function userVoted({ body }, meetingId) {
   check(meetingId, String);
   check(poll, {
     id: String,
+    question: Match.OneOf(String, null, undefined),
     answers: [
       {
         id: Number,

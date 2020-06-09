@@ -13,6 +13,7 @@ import ExternalVideoService from '/imports/ui/components/external-video-player/s
 import CaptionsService from '/imports/ui/components/captions/service';
 import Meetings from '/imports/api/meetings';
 import UserListService from '/imports/ui/components/user-list/service';
+import logger from '/imports/startup/client/logger';
 import {
   shareScreen,
   unshareScreen,

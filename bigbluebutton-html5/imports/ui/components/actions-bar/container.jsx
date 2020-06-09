@@ -11,6 +11,8 @@ import Service from './service';
 import VideoService from '../video-provider/service';
 import ExternalVideoService from '/imports/ui/components/external-video-player/service';
 import CaptionsService from '/imports/ui/components/captions/service';
+import Meetings from '/imports/api/meetings';
+import UserListService from '/imports/ui/components/user-list/service';
 import {
   shareScreen,
   unshareScreen,
@@ -26,6 +28,24 @@ import MediaService, {
 
 const ActionsBarContainer = props => <ActionsBar {...props} />;
 const POLLING_ENABLED = Meteor.settings.public.poll.enabled;
+
+const isMeetingMuteOnStart = () => {
+  const { voiceProp } = Meetings.findOne({ meetingId: Auth.meetingID },
+    { fields: { 'voiceProp.muteOnStart': 1 } });
+  const { muteOnStart } = voiceProp;
+  return muteOnStart;
+};
+
+const toggleMuteAllUsers = () => {
+  UserListService.muteAllUsers(Auth.userID);
+  if (isMeetingMuteOnStart()) {
+    return meetingMuteDisabledLog();
+  }
+  return logger.info({
+    logCode: 'useroptions_mute_all',
+    extraInfo: { logType: 'moderator_action' },
+  }, 'moderator enabled meeting mute, all users muted');
+};
 
 export default withTracker(() => ({
   amIPresenter: Service.amIPresenter(),
@@ -52,4 +72,6 @@ export default withTracker(() => ({
   isThereCurrentPresentation: Presentations.findOne({ meetingId: Auth.meetingID, current: true },
     { fields: {} }),
   allowExternalVideo: Meteor.settings.public.externalVideoPlayer.enabled,
+  isMeetingMuted: isMeetingMuteOnStart(),
+  toggleMuteAllUsers : toggleMuteAllUsers,
 }))(injectIntl(ActionsBarContainer));

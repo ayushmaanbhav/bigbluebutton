@@ -15,6 +15,7 @@ import { styles } from '../styles';
 import ExternalVideoModal from '/imports/ui/components/external-video-player/modal/container';
 
 const propTypes = {
+  isMeteorConnected: PropTypes.bool.isRequired,
   amIPresenter: PropTypes.bool.isRequired,
   intl: intlShape.isRequired,
   mountModal: PropTypes.func.isRequired,
@@ -23,6 +24,8 @@ const propTypes = {
   handleTakePresenter: PropTypes.func.isRequired,
   allowExternalVideo: PropTypes.bool.isRequired,
   stopExternalVideoShare: PropTypes.func.isRequired,
+  isMeetingMuted: PropTypes.bool.isRequired,
+  toggleMuteAllUsers: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -74,6 +77,22 @@ const intlMessages = defineMessages({
     id: 'app.actionsBar.actionsDropdown.stopShareExternalVideo',
     description: 'Stop sharing external video button',
   },
+  muteAllLabel: {
+    id: 'app.userList.userOptions.muteAllLabel',
+    description: 'Mute all label',
+  },
+  muteAllDesc: {
+    id: 'app.userList.userOptions.muteAllDesc',
+    description: 'Mute all description',
+  },
+  unmuteAllLabel: {
+    id: 'app.userList.userOptions.unmuteAllLabel',
+    description: 'Unmute all label',
+  },
+  unmuteAllDesc: {
+    id: 'app.userList.userOptions.unmuteAllDesc',
+    description: 'Unmute all desc',
+  },
 });
 
 class ActionsDropdown extends PureComponent {
@@ -83,6 +102,7 @@ class ActionsDropdown extends PureComponent {
     this.presentationItemId = _.uniqueId('action-item-');
     this.pollId = _.uniqueId('action-item-');
     this.takePresenterId = _.uniqueId('action-item-');
+    this.muteAllId = _.uniqueId('action-item-');
 
     this.handlePresentationClick = this.handlePresentationClick.bind(this);
     this.handleExternalVideoClick = this.handleExternalVideoClick.bind(this);
@@ -99,12 +119,16 @@ class ActionsDropdown extends PureComponent {
   getAvailableActions() {
     const {
       intl,
+      isMeteorConnected,
+      amIModerator,
       amIPresenter,
       allowExternalVideo,
       handleTakePresenter,
       isSharingVideo,
       isPollingEnabled,
       stopExternalVideoShare,
+      isMeetingMuted,
+      toggleMuteAllUsers,
     } = this.props;
 
     const {
@@ -121,6 +145,18 @@ class ActionsDropdown extends PureComponent {
     } = intl;
 
     return _.compact([
+      (amIModerator && isMeteorConnected
+        ? (
+          <DropdownListItem
+            key={this.muteAllId}
+            icon={isMeetingMuted ? 'unmute' : 'mute'}
+            label={intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllLabel' : 'muteAllLabel'])}
+            description={intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllDesc' : 'muteAllDesc'])}
+            onClick={toggleMuteAllUsers}
+          />
+        )
+        : null
+      ),
       (amIPresenter && isPollingEnabled
         ? (
           <DropdownListItem

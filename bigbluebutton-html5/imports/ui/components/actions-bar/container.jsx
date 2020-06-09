@@ -30,49 +30,56 @@ import MediaService, {
 const ActionsBarContainer = props => <ActionsBar {...props} />;
 const POLLING_ENABLED = Meteor.settings.public.poll.enabled;
 
-const isMeetingMuteOnStart = () => {
-  const { voiceProp } = Meetings.findOne({ meetingId: Auth.meetingID },
-    { fields: { 'voiceProp.muteOnStart': 1 } });
-  const { muteOnStart } = voiceProp;
-  return muteOnStart;
-};
+const meetingMuteDisabledLog = () => logger.info({
+  logCode: 'useroptions_unmute_all',
+  extraInfo: { logType: 'moderator_action' },
+}, 'moderator disabled meeting mute');
 
-const toggleMuteAllUsers = () => {
-  UserListService.muteAllUsers(Auth.userID);
-  if (isMeetingMuteOnStart()) {
-    return meetingMuteDisabledLog();
+export default withTracker(() => {
+  const isMeetingMuteOnStart = () => {
+    const { voiceProp } = Meetings.findOne({ meetingId: Auth.meetingID },
+      { fields: { 'voiceProp.muteOnStart': 1 } });
+    const { muteOnStart } = voiceProp;
+    return muteOnStart;
+  };
+  
+  const toggleMuteAllUsers = () => {
+    UserListService.muteAllUsers(Auth.userID);
+    if (isMeetingMuteOnStart()) {
+      return meetingMuteDisabledLog();
+    }
+    return logger.info({
+      logCode: 'useroptions_mute_all',
+      extraInfo: { logType: 'moderator_action' },
+    }, 'moderator enabled meeting mute, all users muted');
+  };
+
+  return {
+    amIPresenter: Service.amIPresenter(),
+    amIModerator: Service.amIModerator(),
+    stopExternalVideoShare: ExternalVideoService.stopWatching,
+    handleExitVideo: () => VideoService.exitVideo(),
+    handleJoinVideo: () => VideoService.joinVideo(),
+    handleShareScreen: onFail => shareScreen(onFail),
+    handleUnshareScreen: () => unshareScreen(),
+    isVideoBroadcasting: isVideoBroadcasting(),
+    screenSharingCheck: getFromUserSettings('bbb_enable_screen_sharing', Meteor.settings.public.kurento.enableScreensharing),
+    enableVideo: getFromUserSettings('bbb_enable_video', Meteor.settings.public.kurento.enableVideo),
+    isLayoutSwapped: getSwapLayout() && shouldEnableSwapLayout(),
+    toggleSwapLayout: MediaService.toggleSwapLayout,
+    handleTakePresenter: Service.takePresenterRole,
+    currentSlidHasContent: PresentationService.currentSlidHasContent(),
+    parseCurrentSlideContent: PresentationService.parseCurrentSlideContent,
+    isSharingVideo: Service.isSharingVideo(),
+    screenShareEndAlert,
+    screenshareDataSavingSetting: dataSavingSetting(),
+    isCaptionsAvailable: CaptionsService.isCaptionsAvailable(),
+    isMeteorConnected: Meteor.status().connected,
+    isPollingEnabled: POLLING_ENABLED,
+    isThereCurrentPresentation: Presentations.findOne({ meetingId: Auth.meetingID, current: true },
+      { fields: {} }),
+    allowExternalVideo: Meteor.settings.public.externalVideoPlayer.enabled,
+    isMeetingMuted: isMeetingMuteOnStart(),
+    toggleMuteAllUsers : toggleMuteAllUsers,
   }
-  return logger.info({
-    logCode: 'useroptions_mute_all',
-    extraInfo: { logType: 'moderator_action' },
-  }, 'moderator enabled meeting mute, all users muted');
-};
-
-export default withTracker(() => ({
-  amIPresenter: Service.amIPresenter(),
-  amIModerator: Service.amIModerator(),
-  stopExternalVideoShare: ExternalVideoService.stopWatching,
-  handleExitVideo: () => VideoService.exitVideo(),
-  handleJoinVideo: () => VideoService.joinVideo(),
-  handleShareScreen: onFail => shareScreen(onFail),
-  handleUnshareScreen: () => unshareScreen(),
-  isVideoBroadcasting: isVideoBroadcasting(),
-  screenSharingCheck: getFromUserSettings('bbb_enable_screen_sharing', Meteor.settings.public.kurento.enableScreensharing),
-  enableVideo: getFromUserSettings('bbb_enable_video', Meteor.settings.public.kurento.enableVideo),
-  isLayoutSwapped: getSwapLayout() && shouldEnableSwapLayout(),
-  toggleSwapLayout: MediaService.toggleSwapLayout,
-  handleTakePresenter: Service.takePresenterRole,
-  currentSlidHasContent: PresentationService.currentSlidHasContent(),
-  parseCurrentSlideContent: PresentationService.parseCurrentSlideContent,
-  isSharingVideo: Service.isSharingVideo(),
-  screenShareEndAlert,
-  screenshareDataSavingSetting: dataSavingSetting(),
-  isCaptionsAvailable: CaptionsService.isCaptionsAvailable(),
-  isMeteorConnected: Meteor.status().connected,
-  isPollingEnabled: POLLING_ENABLED,
-  isThereCurrentPresentation: Presentations.findOne({ meetingId: Auth.meetingID, current: true },
-    { fields: {} }),
-  allowExternalVideo: Meteor.settings.public.externalVideoPlayer.enabled,
-  isMeetingMuted: isMeetingMuteOnStart(),
-  toggleMuteAllUsers : toggleMuteAllUsers,
-}))(injectIntl(ActionsBarContainer));
+})(injectIntl(ActionsBarContainer));

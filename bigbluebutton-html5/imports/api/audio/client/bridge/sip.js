@@ -85,7 +85,7 @@ class SIPSession {
     });
   }
 
-  async getIceServers (sessionToken) {
+  async getIceServers(sessionToken) {
     try {
       const iceServers = await fetchStunTurnServers(sessionToken);
       return iceServers;
@@ -279,7 +279,7 @@ class SIPSession {
         register: false,
         traceSip: true,
         autostart: false,
-        userAgentString: 'BigBlueButton',
+        userAgentString: 'Enlite',
         stunServers: stun,
         turnServers: turn,
         hackPlanBUnifiedPlanTranslation: isSafari,

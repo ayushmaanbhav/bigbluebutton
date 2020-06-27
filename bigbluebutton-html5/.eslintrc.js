@@ -19,6 +19,7 @@ module.exports = {
       "import/no-unresolved": 0,
       "import/no-extraneous-dependencies": 1,
       "react/prop-types": 1,
+      "linebreak-style": ["error", "windows"]
     },
     "globals": {
       "browser": "writable",

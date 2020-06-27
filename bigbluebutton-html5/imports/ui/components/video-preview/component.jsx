@@ -8,6 +8,7 @@ import Button from '/imports/ui/components/button/component';
 import logger from '/imports/startup/client/logger';
 import Modal from '/imports/ui/components/modal/simple/component';
 import browser from 'browser-detect';
+import { Option, Select } from 'antd';
 import { styles } from './styles';
 
 const CAMERA_PROFILES = Meteor.settings.public.kurento.cameraProfiles;
@@ -497,7 +498,6 @@ class VideoPreview extends Component {
               <select
                 id="setQuality"
                 value={selectedProfile || ''}
-                className={styles.select}
                 onChange={this.handleSelectProfile}
                 disabled={skipVideoPreview}
               >

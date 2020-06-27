@@ -59,7 +59,7 @@ class Polling extends Component {
           role="alert"
         >
           <div className={styles.pollingTitle}>
-            {question ? question : intl.formatMessage(intlMessages.pollingTitleLabel)}
+            {question || intl.formatMessage(intlMessages.pollingTitleLabel)}
           </div>
           <div className={cx(pollAnswerStyles)}>
             {poll.answers.map((pollAnswer) => {

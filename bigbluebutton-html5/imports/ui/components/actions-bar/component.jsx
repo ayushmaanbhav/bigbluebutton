@@ -43,7 +43,7 @@ class ActionsBar extends PureComponent {
     const actionBarClasses = {};
 
     actionBarClasses[styles.centerWithActions] = amIPresenter;
-    actionBarClasses[styles.center] = true;
+    actionBarClasses[styles.left] = true;
     actionBarClasses[styles.mobileLayoutSwapped] = isLayoutSwapped && amIPresenter;
 
     return (

@@ -69,12 +69,12 @@ const JoinVideoButton = ({
       onClick={isSharingVideo ? handleCloseVideo : verifyIOS}
       hideLabel
       aria-label={intl.formatMessage(intlMessages.videoButtonDesc)}
-      color={isSharingVideo ? 'primary' : 'default'}
+      color={isSharingVideo ? 'success' : 'primary'}
       icon={isSharingVideo ? 'video' : 'video_off'}
       ghost={!isSharingVideo}
       size="lg"
       circle
-      disabled={isDisabled}
+      disabled={isDisabled || !navigator.mediaDevices}
     />
   );
 };

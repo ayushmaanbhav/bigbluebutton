@@ -178,7 +178,7 @@
   padding: 0 !important;
   overflow: hidden;
   display: none !important;
-  
+
 }
 
 .icon {
@@ -226,9 +226,9 @@
 }
 
 @mixin button-ghost-variant($color, $variant) {
-  color: $color;
+  color: $variant;
   background-image: none;
-  background-color: transparent;
+  background-color: $color;
   border: var(--border-size-large) solid transparent;
 
   &:focus,

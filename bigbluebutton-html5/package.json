@@ -12,7 +12,8 @@
     "start:dev": "ROOT_URL=http://127.0.0.1/html5client NODE_ENV=development meteor",
     "start:dev-fast-mongo": "env ROOT_URL=http://127.0.0.1/html5client MONGO_OPLOG_URL=mongodb://127.0.1.1/local MONGO_URL=mongodb://127.0.1.1/meteor PORT=3000 ROOT_URL=http://127.0.0.1/html5client NODE_ENV=development meteor",
     "test": "wdio ./tests/webdriverio/wdio.conf.js",
-    "lint": "eslint . --ext .jsx,.js"
+    "lint": "eslint . --ext .jsx,.js",
+    "theme": "lessc --modify-var=\"primary-color=#52056D\" ./node_modules/antd/dist/antd.less ./imports/startup/client/custom-antd.css --js"
   },
   "meteor": {
     "mainModule": {
@@ -33,6 +34,7 @@
     "@babel/runtime": "^7.5.5",
     "@browser-bunyan/server-stream": "^1.5.1",
     "@jitsi/sdp-interop": "0.1.14",
+    "antd": "^4.3.5",
     "autoprefixer": "~9.3.1",
     "axios": "^0.19.0",
     "babel-plugin-react-remove-properties": "~0.2.5",

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withTracker } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
+import './custom-antd.css';
 import Auth from '/imports/ui/services/auth';
 import AppContainer from '/imports/ui/components/app/container';
 import ErrorScreen from '/imports/ui/components/error-screen/component';
@@ -355,13 +356,14 @@ const BaseContainer = withTracker(() => {
   }
 
   if (getFromUserSettings('bbb_show_participants_on_login', true) && !deviceInfo.type().isPhone) {
-    Session.set('openPanel', 'userlist');
-    if (CHAT_ENABLED && getFromUserSettings('bbb_show_public_chat_on_login', !Meteor.settings.public.chat.startClosed)) {
-      Session.set('openPanel', 'chat');
-      Session.set('idChatOpen', PUBLIC_CHAT_ID);
-    }
-  } else {
     Session.set('openPanel', '');
+    // if (CHAT_ENABLED && getFromUserSettings('bbb_show_public_chat_on_login',
+    // !Meteor.settings.public.chat.startClosed)) {
+    //   Session.set('openPanel', 'chat');
+    //   Session.set('idChatOpen', PUBLIC_CHAT_ID);
+    // }
+  // } else {
+  //   Session.set('openPanel', '');
   }
 
   return {

@@ -648,7 +648,7 @@ class PresentationArea extends PureComponent {
           <div
             className={styles.svgContainer}
             style={{
-              height: svgHeight + toolbarHeight,
+              height: '100%',
             }}
           >
             {showSlide

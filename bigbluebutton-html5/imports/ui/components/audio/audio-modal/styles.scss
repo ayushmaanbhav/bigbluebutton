@@ -38,10 +38,12 @@
   }
 
   .audioBtn:only-child {
-    margin: inherit 0 inherit inherit;
+    margin: inherit;
+    margin-right: 0!important;
 
     [dir="rtl"] & {
-      margin: inherit!important inherit!important inherit!important 0;
+      margin: inherit!important;
+      margin-left: 0!important;
     }
   }
 }

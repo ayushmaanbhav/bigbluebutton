@@ -44,6 +44,7 @@ const JoinVideoButton = ({
   handleCloseVideo,
   notify,
   validIOSVersion,
+  className,
 }) => {
   const verifyIOS = () => {
     if (!validIOSVersion()) {
@@ -65,7 +66,7 @@ const JoinVideoButton = ({
   return (
     <Button
       label={disabledLabel}
-      className={cx(styles.button, isSharingVideo || styles.btn)}
+      className={cx(styles.button, isSharingVideo || styles.btn, className)}
       onClick={isSharingVideo ? handleCloseVideo : verifyIOS}
       hideLabel
       aria-label={intl.formatMessage(intlMessages.videoButtonDesc)}

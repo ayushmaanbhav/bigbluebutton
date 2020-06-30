@@ -49,14 +49,11 @@ export default withTracker(() => {
 
   const { connectRecordingObserver, processOutsideToggleRecording } = Service;
   const currentUser = Users.findOne({ userId: Auth.userID }, { fields: { role: 1 } });
-  const openPanel = Session.get('openPanel');
-  const isExpanded = openPanel !== '';
   const amIModerator = currentUser.role === ROLE_MODERATOR;
   const hasUnreadMessages = checkUnreadMessages();
 
   return {
     amIModerator,
-    isExpanded,
     currentUserId: Auth.userID,
     processOutsideToggleRecording,
     connectRecordingObserver,

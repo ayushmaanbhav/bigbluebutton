@@ -5,12 +5,12 @@ public:
     audioChatNotification: false
     autoJoin: true
     listenOnlyMode: true
-    forceListenOnly: false
-    skipCheck: false
+    forceListenOnly: true
+    skipCheck: true
     clientTitle: BigBlueButton
     appName: BigBlueButton HTML5 Client
     bbbServerVersion: 2.2
-    copyright: "©2020 BigBlueButton Inc."
+    copyright: "©2020 Enlite"
     html5ClientBuild: HTML5_CLIENT_VERSION
     helpLink: https://bigbluebutton.org/html5/
     lockOnJoin: true
@@ -82,7 +82,7 @@ public:
     enableNetworkMonitoring: false
     packetLostThreshold: 10
   kurento:
-    wsUrl: HOST
+    wsUrl: ws://localhost/bbb-webrtc-sfu
     chromeDefaultExtensionKey: akgoaoikmbmhcopjgakkcepdgdgkjfbc
     chromeDefaultExtensionLink: https://chrome.google.com/webstore/detail/bigbluebutton-screenshare/akgoaoikmbmhcopjgakkcepdgdgkjfbc
     chromeExtensionKey: KEY

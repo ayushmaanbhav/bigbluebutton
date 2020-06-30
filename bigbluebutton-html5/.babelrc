@@ -2,7 +2,8 @@
   "env": {
     "production": {
       "plugins": [
-        "react-remove-properties"
+        "react-remove-properties",
+        ["import", { "libraryName": "antd", "libraryDirectory": "lib"}, "ant"]
       ]
     }
   }

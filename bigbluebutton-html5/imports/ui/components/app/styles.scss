@@ -21,12 +21,15 @@
 }
 
 .navbar {
-  position: relative;
+  position: absolute;
+  width: 100%;
   text-align: center;
-  background: var(--color-primary);
+  background: var(--color-transparent);
   font-size: 1.5rem;
   padding: var(--bars-padding) var(--bars-padding) 0 var(--bars-padding);
   height: 7rem;
+  z-index: 11;
+  pointer-events: none;
 }
 
 .wrapper {
@@ -91,7 +94,7 @@
 
   @include mq($medium-up) {
     flex: 5;
-    order: 2;
+    order: 0;
   }
 }
 
@@ -218,9 +221,12 @@
   z-index: 2;
 }
 
+
+
 .actionsbar {
-  flex: 1;
   padding: var(--bars-padding);
-  position: relative;
-  order: 3;
+  position: absolute;
+  bottom: 10px;
+  z-index: 10;
+  width: 100%;
 }

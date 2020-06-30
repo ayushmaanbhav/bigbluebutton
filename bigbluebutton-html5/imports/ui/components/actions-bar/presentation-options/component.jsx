@@ -8,6 +8,7 @@ import { styles } from '../styles';
 const propTypes = {
   intl: intlShape.isRequired,
   toggleSwapLayout: PropTypes.func.isRequired,
+  isThereCurrentPresentation: PropTypes.bool.isRequired,
 };
 
 const intlMessages = defineMessages({
@@ -21,7 +22,8 @@ const intlMessages = defineMessages({
   },
 });
 
-const shouldUnswapLayout = () => MediaService.shouldShowScreenshare() || MediaService.shouldShowExternalVideo();
+const shouldUnswapLayout = () => MediaService.shouldShowScreenshare()
+  || MediaService.shouldShowExternalVideo();
 
 const PresentationOptionsContainer = ({ intl, toggleSwapLayout, isThereCurrentPresentation }) => {
   if (shouldUnswapLayout()) toggleSwapLayout();

@@ -6,6 +6,7 @@ import getFromUserSettings from '/imports/ui/services/users-settings';
 import Auth from '/imports/ui/services/auth';
 import PresentationService from '/imports/ui/components/presentation/service';
 import Presentations from '/imports/api/presentations';
+import { Session } from 'meteor/session';
 import ActionsBar from './component';
 import Service from './service';
 import VideoService from '../video-provider/service';
@@ -26,6 +27,7 @@ import MediaService, {
   getSwapLayout,
   shouldEnableSwapLayout,
 } from '../media/service';
+import userListService from '../user-list/service';
 
 const ActionsBarContainer = props => <ActionsBar {...props} />;
 const POLLING_ENABLED = Meteor.settings.public.poll.enabled;
@@ -36,13 +38,24 @@ const meetingMuteDisabledLog = () => logger.info({
 }, 'moderator disabled meeting mute');
 
 export default withTracker(() => {
+  const checkUnreadMessages = () => {
+    const activeChats = userListService.getActiveChats();
+    const hasUnreadMessages = activeChats
+      .filter(chat => chat.userId !== Session.get('idChatOpen'))
+      .some(chat => chat.unreadCounter > 0);
+    return hasUnreadMessages;
+  };
+  const openPanel = Session.get('openPanel');
+  const isExpanded = openPanel !== '';
+  const hasUnreadMessages = checkUnreadMessages();
+
   const isMeetingMuteOnStart = () => {
     const { voiceProp } = Meetings.findOne({ meetingId: Auth.meetingID },
       { fields: { 'voiceProp.muteOnStart': 1 } });
     const { muteOnStart } = voiceProp;
     return muteOnStart;
   };
-  
+
   const toggleMuteAllUsers = () => {
     UserListService.muteAllUsers(Auth.userID);
     if (isMeetingMuteOnStart()) {
@@ -80,6 +93,9 @@ export default withTracker(() => {
       { fields: {} }),
     allowExternalVideo: Meteor.settings.public.externalVideoPlayer.enabled,
     isMeetingMuted: isMeetingMuteOnStart(),
-    toggleMuteAllUsers : toggleMuteAllUsers,
-  }
+    toggleMuteAllUsers,
+    isExpanded,
+    currentUserId: Auth.userID,
+    hasUnreadMessages,
+  };
 })(injectIntl(ActionsBarContainer));

@@ -128,6 +128,7 @@ const DesktopShare = ({
   isMeteorConnected,
   screenshareDataSavingSetting,
   mountModal,
+  className,
 }) => {
   // This is the failure callback that will be passed to the /api/screenshare/kurento.js
   // script on the presenter's call
@@ -172,7 +173,7 @@ const DesktopShare = ({
   return shouldAllowScreensharing
     ? (
       <Button
-        className={cx(styles.button, isVideoBroadcasting || styles.btn)}
+        className={cx(styles.button, isVideoBroadcasting || styles.btn, className)}
         disabled={!ScreenshareBridgeService.hasDisplayMedia
         || ((!isMeteorConnected && !isVideoBroadcasting) || !screenshareDataSavingSetting)}
         icon={isVideoBroadcasting ? 'desktop' : 'desktop_off'}

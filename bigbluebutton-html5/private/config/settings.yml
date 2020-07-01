@@ -4,8 +4,8 @@ public:
     desktopFontSize: 14px
     audioChatNotification: false
     autoJoin: true
-    listenOnlyMode: true
-    forceListenOnly: true
+    listenOnlyMode: false
+    forceListenOnly: false
     skipCheck: true
     clientTitle: BigBlueButton
     appName: BigBlueButton HTML5 Client

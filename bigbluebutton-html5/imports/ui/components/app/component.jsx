@@ -205,8 +205,8 @@ class App extends Component {
 
   renderPanel() {
     const { enableResize } = this.state;
-    const { openPanel, isRTL } = this.props;
-
+    const { openPanel } = this.props;
+    const isRTL = true;
     return (
       <PanelManager
         {...{

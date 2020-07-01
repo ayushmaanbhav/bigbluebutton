@@ -31,7 +31,8 @@
 
 .hiddenControls {
   opacity: 0;
-  transition: opacity 1s;
+  transition: opacity 6s;
+  -webkit-transition: opacity 6s;
   transition-timing-function: linear;
 }
 
@@ -39,6 +40,8 @@
   &:hover {
     .hiddenControls {
       opacity: 1;
+      transition: opacity 1s;
+      -webkit-transition: opacity 1s;
     }
   }
 }

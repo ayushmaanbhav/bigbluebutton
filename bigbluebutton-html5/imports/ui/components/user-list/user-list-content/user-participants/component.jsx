@@ -172,12 +172,12 @@ class UserParticipants extends Component {
         {
           !compact
             ? (
-              <div className={styles.container}>
+              <div dir="rtl" className={styles.container}>
                 <h2 className={styles.smallTitle}>
                   {intl.formatMessage(intlMessages.usersTitle)}
-                  &nbsp;(
+                  {' ('}
                   {users.length}
-                  )
+                  {')'}
                 </h2>
                 {currentUser.role === ROLE_MODERATOR
                   ? (
@@ -189,7 +189,6 @@ class UserParticipants extends Component {
                     />
                   ) : null
                 }
-
               </div>
             )
             : <hr className={styles.separator} />

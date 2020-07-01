@@ -636,7 +636,7 @@ class UserDropdown extends PureComponent {
             [dropdownDirection]: `${dropdownOffset}px`,
           }}
           className={styles.dropdownContent}
-          placement={`right ${dropdownDirection}`}
+          placement={`left ${dropdownDirection}`}
         >
           <DropdownList
             ref={(ref) => { this.list = ref; }}

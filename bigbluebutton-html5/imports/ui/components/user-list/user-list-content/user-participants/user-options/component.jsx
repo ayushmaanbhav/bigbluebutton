@@ -302,7 +302,6 @@ class UserOptions extends PureComponent {
             label={intl.formatMessage(intlMessages.optionsLabel)}
             icon="settings"
             ghost
-            color="primary"
             hideLabel
             className={styles.optionsButton}
             size="sm"
@@ -310,6 +309,7 @@ class UserOptions extends PureComponent {
           />
         </DropdownTrigger>
         <DropdownContent
+          dir="ltr"
           className={styles.dropdownContent}
           placement="right top"
         >

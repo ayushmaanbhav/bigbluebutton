@@ -11,6 +11,7 @@
   --userlist-handle-width: 5px; // 5px so user-list and chat resize handle render as the same size
   --poll-pane-min-width: 20em;
   --panel-margin-left: 0.1em;
+  --panel-border-left: 1px solid #f0f0f0;
 }
 
 .main {
@@ -114,6 +115,7 @@
   z-index: 2;
   overflow: visible;
   order: 1;
+  border-left: var(--panel-border-left);
 
   @include mq($small-only) {
     top: var(--navbar-height);
@@ -132,7 +134,7 @@
 }
 
 .userlistPad {
-  background-color: var(--color-off-white);
+  background-color: var(--color-white);
   width: var(--userlist-handle-width);
 }
 
@@ -229,4 +231,5 @@
   bottom: 10px;
   z-index: 10;
   width: 100%;
+  pointer-events: none;
 }

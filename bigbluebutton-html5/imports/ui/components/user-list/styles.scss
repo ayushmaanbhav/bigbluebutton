@@ -10,7 +10,7 @@
 :root {
   --unread-messages-bg: var(--color-danger);
   --user-list-text: var(--color-gray);
-  --user-list-bg: var(--color-off-white);
+  --user-list-bg: var(--color-white);
 
   --user-thumbnail-border: var(--color-gray-light);
   --user-thumbnail-text: var(--user-thumbnail-border);
@@ -154,7 +154,7 @@
 .enterActive,
 .appearActive {
   opacity: 1;
-  
+
   :global(.animationsEnabled) & {
     transition: all 600ms;
   }

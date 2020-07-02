@@ -19,12 +19,17 @@ const defaultProps = {
 };
 
 class NavBar extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = { centerStyle: { opacity: 1 } };
+  }
+
   componentDidMount() {
     const {
       processOutsideToggleRecording,
       connectRecordingObserver,
     } = this.props;
-
+    setTimeout(() => { this.setState({ centerStyle: {} }); }, 15000);
     if (Meteor.settings.public.allowOutsideCommands.toggleRecording
       || getFromUserSettings('bbb_outside_toggle_recording', false)) {
       connectRecordingObserver();
@@ -42,14 +47,15 @@ class NavBar extends PureComponent {
       presentationTitle,
       amIModerator,
     } = this.props;
-
+    const {
+      centerStyle,
+    } = this.state;
 
     return (
       <div className={styles.navbar}>
         <div className={styles.top}>
-          <div className={styles.center}>
+          <div style={centerStyle} className={styles.center}>
             <h1 className={styles.presentationTitle}>{presentationTitle}</h1>
-
             <RecordingIndicator
               mountModal={mountModal}
               amIModerator={amIModerator}
@@ -69,4 +75,4 @@ class NavBar extends PureComponent {
 
 NavBar.propTypes = propTypes;
 NavBar.defaultProps = defaultProps;
-export default withShortcutHelper(withModalMounter(injectIntl(NavBar)), 'toggleUserList');
+export default withShortcutHelper(withModalMounter(injectIntl(NavBar)));

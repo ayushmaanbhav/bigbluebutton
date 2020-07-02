@@ -137,10 +137,10 @@ export default withModalMounter(withTracker(() => {
   data.swapLayout = (getSwapLayout() || !hasPresentation) && shouldEnableSwapLayout();
   data.disableVideo = !viewParticipantsWebcams;
 
-  if (data.swapLayout) {
-    data.floatingOverlay = true;
-    data.hideOverlay = true;
-  }
+  // if (!data.swapLayout) {
+  data.floatingOverlay = true;
+  data.hideOverlay = true;
+  // }
 
   if (MediaService.shouldShowExternalVideo()) {
     data.children = (
@@ -150,7 +150,7 @@ export default withModalMounter(withTracker(() => {
     );
   }
 
-  data.webcamPlacement = Storage.getItem('webcamPlacement');
+  data.webcamPlacement = 'floating'; // Storage.getItem('webcamPlacement');
 
   MediaContainer.propTypes = propTypes;
   return data;

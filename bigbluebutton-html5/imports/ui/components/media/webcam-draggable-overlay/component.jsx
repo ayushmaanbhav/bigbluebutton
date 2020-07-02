@@ -234,17 +234,26 @@ class WebcamDraggable extends Component {
     let placement = Storage.getItem('webcamPlacement');
     const lastPosition = Storage.getItem('webcamLastPosition') || { x: 0, y: 0 };
     let position = lastPosition;
+    const {
+      width: mediaWidth,
+      height: mediaHeight,
+    } = this.getMediaBounds();
+
+    const {
+      width: webcamsWidth,
+      height: webcamsHeight,
+    } = this.getWebcamsListBounds();
+
     if (!placement) {
       placement = webcamsDefaultPlacement;
     }
-
     if (dragging) {
       position = webcamDraggableState.tempPosition;
     } else if (!dragging && placement === 'floating' && singleWebcam) {
       position = webcamDraggableState.lastPosition;
     } else {
       position = {
-        x: 0,
+        x: (mediaWidth - webcamsWidth) / 2,
         y: 0,
       };
     }
@@ -256,15 +265,6 @@ class WebcamDraggable extends Component {
       };
     }
 
-    const {
-      width: mediaWidth,
-      height: mediaHeight,
-    } = this.getMediaBounds();
-
-    const {
-      width: webcamsWidth,
-      height: webcamsHeight,
-    } = this.getWebcamsListBounds();
 
     const isOverflowWidth = (lastPosition.x + webcamsWidth) > mediaWidth;
     const isOverflowHeight = (lastPosition.y + webcamsHeight) > mediaHeight;
@@ -297,38 +297,38 @@ class WebcamDraggable extends Component {
       [styles.dragging]: dragging,
     });
 
-    const dropZoneTopClassName = cx({
-      [styles.dropZoneTop]: true,
-      [styles.show]: dragging,
-      [styles.hide]: !dragging,
-      [styles.cursorGrabbing]: dragging && !isCameraFullscreen,
-    });
-
-    const dropZoneBottomClassName = cx({
-      [styles.dropZoneBottom]: true,
-      [styles.show]: dragging,
-      [styles.hide]: !dragging,
-      [styles.cursorGrabbing]: dragging && !isCameraFullscreen,
-    });
-
-    const dropZoneBgTopClassName = cx({
-      [styles.dropZoneBgTop]: true,
-    });
-
-    const dropZoneBgBottomClassName = cx({
-      [styles.dropZoneBgBottom]: true,
-    });
+    // const dropZoneTopClassName = cx({
+    //   [styles.dropZoneTop]: true,
+    //   [styles.show]: dragging,
+    //   [styles.hide]: !dragging,
+    //   [styles.cursorGrabbing]: dragging && !isCameraFullscreen,
+    // });
+    //
+    // const dropZoneBottomClassName = cx({
+    //   [styles.dropZoneBottom]: true,
+    //   [styles.show]: dragging,
+    //   [styles.hide]: !dragging,
+    //   [styles.cursorGrabbing]: dragging && !isCameraFullscreen,
+    // });
+    //
+    // const dropZoneBgTopClassName = cx({
+    //   [styles.dropZoneBgTop]: true,
+    // });
+    //
+    // const dropZoneBgBottomClassName = cx({
+    //   [styles.dropZoneBgBottom]: true,
+    // });
 
     return (
       <Fragment>
-        <div
-          className={dropZoneTopClassName}
-          style={{ height: !singleWebcam ? '50%' : '20%' }}
-        >
-          <div
-            className={dropZoneBgTopClassName}
-          />
-        </div>
+        {/* <div */}
+        {/*  className={dropZoneTopClassName} */}
+        {/*  style={{ height: !singleWebcam ? '50%' : '20%' }} */}
+        {/* > */}
+        {/*  <div */}
+        {/*    className={dropZoneBgTopClassName} */}
+        {/*  /> */}
+        {/* </div> */}
 
         <Draggable
           handle="video"
@@ -392,14 +392,14 @@ class WebcamDraggable extends Component {
           </Resizable>
         </Draggable>
 
-        <div
-          className={dropZoneBottomClassName}
-          style={{ height: !singleWebcam ? '50%' : '20%' }}
-        >
-          <div
-            className={dropZoneBgBottomClassName}
-          />
-        </div>
+        {/* <div */}
+        {/*  className={dropZoneBottomClassName} */}
+        {/*  style={{ height: !singleWebcam ? '50%' : '20%' }} */}
+        {/* > */}
+        {/*  <div */}
+        {/*    className={dropZoneBgBottomClassName} */}
+        {/*  /> */}
+        {/* </div> */}
       </Fragment>
     );
   }

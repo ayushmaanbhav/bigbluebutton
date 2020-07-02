@@ -34,10 +34,15 @@
 
 .recordingControlON {
   @extend %recordingControl;
-
+  span {
+    border: none;
+    box-shadow: none;
+    background-color: transparent !important;
+    color: var(--color-danger) !important;
+  }
   padding: 5px;
-  background-color: var(--color-primary);
-  border: var(--border-size-large) solid var(--color-primary);
+  background: var(--color-white);
+  border: var(--border-size-large) solid var(--color-danger);
 
   &:focus {
     background-clip: padding-box;
@@ -47,10 +52,16 @@
 
 .recordingControlOFF {
   @extend %recordingControl;
-
+  span {
+    border: none;
+    box-shadow: none;
+    background-color: transparent !important;
+    color: var(--color-white) !important;
+  }
   padding: 7px;
-  border: var(--border-size-small) solid var(--color-white);
-  
+  background:  var(--color-danger);
+  border: var(--border-size-small) solid var(--color-danger);
+
   &:focus {
     padding: 5px;
     border: var(--border-size-large) solid var(--color-white);
@@ -61,9 +72,8 @@
 .presentationTitle {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  font-weight: 200;
-  color: var(--color-white);
+  font-weight: 600;
+  color: var(--color-primary);
   font-size: var(--font-size-base);
   padding: 0;
   margin-left: var(--sm-padding-x);
@@ -72,6 +82,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 30vw;
+  line-height: 1;
 
   [dir="rtl"]  & {
     margin-left: 0;
@@ -79,7 +90,7 @@
   }
 
   > [class^="icon-bbb-"] {
-    font-size: 75%;
+    font-size: 100%;
   }
 
   span {
@@ -98,6 +109,7 @@
 }
 
 .recordingIndicator {
+  pointer-events: auto;
   &:hover {
     @include highContrastOutline();
   }

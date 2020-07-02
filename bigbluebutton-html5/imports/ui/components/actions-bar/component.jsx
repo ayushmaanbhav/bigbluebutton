@@ -169,7 +169,7 @@ class ActionsBar extends PureComponent {
               aria-label={ariaLabel}
               shape="circle"
               aria-expanded={isExpanded}
-              access-key={TOGGLE_USERLIST_AK}
+              accessKey={TOGGLE_USERLIST_AK}
               icon={isExpanded ? <RightOutlined /> : <TeamOutlined />}
             />
           </Badge>

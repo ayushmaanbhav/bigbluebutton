@@ -1,4 +1,4 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment, PureComponent } from 'react';
 import RecordingContainer from '/imports/ui/components/recording/container';
 import humanizeSeconds from '/imports/utils/humanizeSeconds';
 import Tooltip from '/imports/ui/components/tooltip/component';
@@ -135,7 +135,11 @@ class RecordingIndicator extends PureComponent {
     const recordingIndicatorIcon = (
       <span className={styles.recordingIndicatorIcon}>
         <svg xmlns="http://www.w3.org/2000/svg" height="100%" version="1" viewBox="0 0 20 20">
-          <g stroke="#FFF" fill="#FFF" strokeLinecap="square">
+          <g
+            stroke={recording ? '#F00' : '#FFF'}
+            fill={recording ? '#F00' : '#FFF'}
+            strokeLinecap="square"
+          >
             <circle
               fill="none"
               strokeWidth="1"
@@ -200,7 +204,6 @@ class RecordingIndicator extends PureComponent {
           {showButton
             ? recordingButton
             : null}
-
           {showButton ? null : (
             <Tooltip
               title={`${intl.formatMessage(recording
@@ -214,7 +217,6 @@ class RecordingIndicator extends PureComponent {
                 className={styles.recordingStatusViewOnly}
               >
                 {recordingIndicatorIcon}
-
                 {recording
                   ? <div className={styles.presentationTitle}>{humanizeSeconds(time)}</div> : null}
               </div>

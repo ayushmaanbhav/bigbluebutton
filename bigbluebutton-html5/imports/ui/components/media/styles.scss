@@ -58,6 +58,7 @@ $after-content-order: 3;
 }
 
 .overlayToTop {
+  top: 0;
   order: $before-content-order !important;
 }
 

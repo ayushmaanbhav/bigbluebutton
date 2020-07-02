@@ -28,7 +28,7 @@ const intlMessages = defineMessages({
   },
   partnerDisconnected: {
     id: 'app.chat.partnerDisconnected',
-    description: 'System chat message when the private chat partnet disconnect from the meeting',
+    description: 'System chat message when the private chat partner disconnect from the meeting',
   },
 });
 

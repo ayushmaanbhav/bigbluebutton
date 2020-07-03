@@ -3,6 +3,10 @@ import { styles } from './styles.scss';
 
 const LoadingScreen = ({ children }) => (
   <div className={styles.background}>
+    <div className={styles.logo}>
+      <img src="https://res.cloudinary.com/enlite/image/upload/v1593803863/images/logo.png" alt="Enlite" />
+      <h1>Enlite</h1>
+    </div>
     <div className={styles.spinner}>
       <div className={styles.bounce1} />
       <div className={styles.bounce2} />

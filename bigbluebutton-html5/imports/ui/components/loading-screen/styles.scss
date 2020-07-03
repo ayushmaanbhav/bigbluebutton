@@ -1,12 +1,12 @@
 @import "/imports/ui/stylesheets/variables/_all";
-
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100&display=swap');
 /* Variables
  * ==========
  */
 
 :root {
-  --loader-bg: var(--color-gray-dark);
-  --loader-bullet: var(--color-white);
+  --loader-bg: var(--color-white);
+  --loader-bullet: var(--color-primary);
   --loader-message-color: var(--color-white);
 }
 
@@ -43,6 +43,23 @@
 
   :global(.animationsEnabled) & {
     animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  }
+}
+
+.logo{
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  img{
+    height: 12rem;
+  }
+  h1{
+    font-family: "Raleway",serif;
+    font-weight: 600;
+    font-size: 8rem;
+    color: #52056d;
+    margin-left: 10px;
   }
 }
 

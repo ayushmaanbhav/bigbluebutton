@@ -90,7 +90,7 @@ class ToolbarSubmenu extends Component {
     if (type === 'color') {
       return (
         <svg className={styles.customSvgIcon}>
-          <rect x="20%" y="20%" width="60%" height="60%" fill={obj.value} />
+          <circle cx="50%" cy="50%" r={14} fill={obj.value} stroke={obj.value} />
         </svg>
       );
     } if (type === 'thickness') {
@@ -102,7 +102,7 @@ class ToolbarSubmenu extends Component {
     } if (type === 'font-size') {
       return (
         <p className={styles.textThickness} style={{ fontSize: obj.value }}>
-          Aa
+          {'Aa'}
         </p>
       );
     }

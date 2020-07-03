@@ -526,7 +526,7 @@ class WhiteboardToolbar extends Component {
           transition: `color ${TRANSITION_DURATION}, font-size ${TRANSITION_DURATION}`,
         }}
       >
-        Aa
+        {'Aa'}
       </p>
     );
   }
@@ -698,7 +698,7 @@ class WhiteboardToolbar extends Component {
               fill={colorSelected.value}
             />
           ) : (
-            <rect x="25%" y="25%" width="50%" height="50%" stroke="black" strokeWidth="1">
+            <circle cx="50%" cy="50%" r={14} fill={15} stroke="black">
               <animate
                 ref={(ref) => { this.colorListIconColor = ref; }}
                 attributeName="fill"
@@ -710,7 +710,7 @@ class WhiteboardToolbar extends Component {
                 repeatCount="1"
                 fill="freeze"
               />
-            </rect>
+            </circle>
           )
         }
       </svg>

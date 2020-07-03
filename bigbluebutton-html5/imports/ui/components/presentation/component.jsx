@@ -443,11 +443,10 @@ class PresentationArea extends PureComponent {
       <div
         dir="rtl"
         style={{
-          position: 'absolute',
           width: svgDimensions.width,
           height: svgDimensions.height,
-          textAlign: 'center',
         }}
+        className={styles.slidesContainer}
       >
         {this.renderPresentationClose()}
         {this.renderPresentationDownload()}

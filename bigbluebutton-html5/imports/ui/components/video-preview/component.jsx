@@ -330,12 +330,10 @@ class VideoPreview extends Component {
     this.displayInitialPreview(webcamValue);
   }
 
-  handleSelectProfile(event) {
-    const profileValue = event.target.value;
+  handleSelectProfile(value) {
+    const profileValue = value;
     const { webcamDeviceId } = this.state;
-
     const selectedProfile = CAMERA_PROFILES.find(profile => profile.id === profileValue);
-
     this.displayPreview(webcamDeviceId, selectedProfile);
   }
 
@@ -469,19 +467,15 @@ class VideoPreview extends Component {
         {
           availableWebcams && availableWebcams.length > 0
             ? (
-              <select
+              <Select
                 id="setCam"
                 value={webcamDeviceId || ''}
-                className={styles.select}
                 onChange={this.handleSelectWebcam}
                 disabled={skipVideoPreview}
-              >
-                {availableWebcams.map(webcam => (
-                  <option key={webcam.deviceId} value={webcam.deviceId}>
-                    {webcam.label}
-                  </option>
+                options={availableWebcams.map(webcam => (
+                  { value: webcam.deviceId, key: webcam.deviceId, label: webcam.label }
                 ))}
-              </select>
+              />
             )
             : (
               <span>
@@ -495,18 +489,15 @@ class VideoPreview extends Component {
         {
           availableProfiles && availableProfiles.length > 0
             ? (
-              <select
+              <Select
                 id="setQuality"
                 value={selectedProfile || ''}
                 onChange={this.handleSelectProfile}
                 disabled={skipVideoPreview}
-              >
-                {availableProfiles.map(profile => (
-                  <option key={profile.id} value={profile.id}>
-                    {profile.name}
-                  </option>
+                options={availableProfiles.map(profile => (
+                  { value: profile.id, key: profile.id, label: profile.name }
                 ))}
-              </select>
+              />
             )
             : (
               <span>

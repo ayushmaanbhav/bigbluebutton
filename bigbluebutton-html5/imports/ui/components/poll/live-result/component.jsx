@@ -202,7 +202,7 @@ class LiveResult extends PureComponent {
                 stopPoll();
               }}
               label={intl.formatMessage(intlMessages.publishLabel)}
-              color="primary"
+              color={waiting ? 'primary' : 'success'}
               className={styles.btn}
             />
           ) : (
@@ -212,12 +212,12 @@ class LiveResult extends PureComponent {
                 handleBackClick();
               }}
               label={intl.formatMessage(intlMessages.backLabel)}
-              color="default"
+              color="primary"
               className={styles.btn}
             />
           )
         }
-        <table>
+        <table style={{ width: '100%' }}>
           <tbody>
             <tr>
               <th className={styles.theading}>{intl.formatMessage(intlMessages.usersTitle)}</th>

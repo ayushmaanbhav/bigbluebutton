@@ -441,6 +441,7 @@ class PresentationArea extends PureComponent {
 
     return (
       <div
+        dir="rtl"
         style={{
           position: 'absolute',
           width: svgDimensions.width,

@@ -237,7 +237,7 @@ class AudioModal extends Component {
     const { MIC_ERROR } = AudioError;
     const noSSL = !window.location.protocol.includes('https');
 
-    if (noSSL) {
+    if (noSSL && window.location.host !== 'localhost') {
       return this.setState({
         content: 'help',
         errCode: MIC_ERROR.NO_SSL,

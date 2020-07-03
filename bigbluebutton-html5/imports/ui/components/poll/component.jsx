@@ -6,8 +6,12 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import _ from 'lodash';
 import { Session } from 'meteor/session';
 import Button from '/imports/ui/components/button/component';
+import { Input, Button as AntButton } from 'antd';
+import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import LiveResult from './live-result/component';
 import { styles } from './styles.scss';
+
+const { TextArea } = Input;
 
 const intlMessages = defineMessages({
   pollPaneTitle: {
@@ -89,7 +93,7 @@ const intlMessages = defineMessages({
 });
 
 const MAX_CUSTOM_FIELDS = Meteor.settings.public.poll.max_custom;
-const MAX_INPUT_CHARS = 45;
+const MAX_INPUT_CHARS = 500;
 
 class Poll extends Component {
   constructor(props) {
@@ -99,7 +103,8 @@ class Poll extends Component {
       customPollReq: false,
       isPolling: false,
       customPollValues: [],
-      customQuestion: ''
+      customQuestion: '',
+      numOfQuizOptions: MAX_CUSTOM_FIELDS,
     };
 
     this.inputEditor = [];
@@ -161,6 +166,7 @@ class Poll extends Component {
       isPolling: false,
       customPollValues: this.inputEditor,
       customQuestion: this.customQuestion,
+      numOfQuizOptions: MAX_CUSTOM_FIELDS,
     }, document.activeElement.blur());
   }
 
@@ -201,11 +207,31 @@ class Poll extends Component {
 
   renderCustomView() {
     const { intl, startCustomPoll } = this.props;
+    const { numOfQuizOptions } = this.state;
     const isDisabled = _.compact(this.inputEditor).length < 1;
 
     return (
       <div className={styles.customInputWrapper}>
         {this.renderInputFields()}
+        <div style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          margin: '1rem 0',
+        }}
+        >
+          <AntButton
+            type="dashed"
+            onClick={() => {
+              this.setState({ numOfQuizOptions: numOfQuizOptions + 1 });
+            }}
+            style={{ width: '80%' }}
+          >
+            <PlusOutlined />
+            {'Add answer'}
+          </AntButton>
+        </div>
+
         <Button
           onClick={() => {
             if (this.inputEditor.length > 0) {
@@ -225,32 +251,32 @@ class Poll extends Component {
 
   renderInputFields() {
     const { intl } = this.props;
-    const { customPollValues, customQuestion } = this.state;
+    const { customPollValues, customQuestion, numOfQuizOptions } = this.state;
     let items = [];
 
     items[0] = (
-      <div key={`custom-poll-question`} className={styles.pollQuestion}>
-        <input
+      <div key="custom-poll-question" className={styles.pollQuestion}>
+        <TextArea
           aria-label={intl.formatMessage(intlMessages.questionPlaceholder)}
           placeholder={intl.formatMessage(intlMessages.questionPlaceholder)}
-          className={styles.input}
-          onChange={event => this.handleQuestionChange(event)}
           defaultValue={customQuestion}
           maxLength={MAX_INPUT_CHARS}
+          onChange={event => this.handleQuestionChange(event)}
+          rows={2}
+          prefix={<QuestionOutlined />}
         />
       </div>
     );
 
-    items = items.concat(_.range(1, MAX_CUSTOM_FIELDS + 1).map((ele, index) => {
+    items = items.concat(_.range(1, numOfQuizOptions + 1).map((ele, index) => {
       const id = index;
       return (
         <div key={`custom-poll-${id}`} className={styles.pollInput}>
-          <input
-            aria-label={intl.formatMessage(
-              intlMessages.ariaInputCount, { 0: id + 1, 1: MAX_CUSTOM_FIELDS },
-            )}
+          <Input
             placeholder={intl.formatMessage(intlMessages.customPlaceholder)}
-            className={styles.input}
+            aria-label={intl.formatMessage(
+              intlMessages.ariaInputCount, { 0: id + 1, 1: numOfQuizOptions },
+            )}
             onChange={event => this.handleInputChange(id, event)}
             defaultValue={customPollValues[id]}
             maxLength={MAX_INPUT_CHARS}

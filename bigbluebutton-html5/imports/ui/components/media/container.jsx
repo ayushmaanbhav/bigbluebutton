@@ -150,7 +150,7 @@ export default withModalMounter(withTracker(() => {
     );
   }
 
-  data.webcamPlacement = 'floating'; // Storage.getItem('webcamPlacement');
+  data.webcamPlacement = Storage.getItem('webcamPlacement');
 
   MediaContainer.propTypes = propTypes;
   return data;

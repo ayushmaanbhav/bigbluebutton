@@ -1,14 +1,14 @@
 public:
   app:
-    mobileFontSize: 16px
+    mobileFontSize: 14px
     desktopFontSize: 14px
     audioChatNotification: false
     autoJoin: true
     listenOnlyMode: false
     forceListenOnly: false
     skipCheck: true
-    clientTitle: BigBlueButton
-    appName: BigBlueButton HTML5 Client
+    clientTitle: Enlite
+    appName: Enlite Client
     bbbServerVersion: 2.2
     copyright: "©2020 Enlite"
     html5ClientBuild: HTML5_CLIENT_VERSION
@@ -124,7 +124,7 @@ public:
     enableVideoStats: false
     enableVideoMenu: true
     enableListenOnly: true
-    autoShareWebcam: false
+    autoShareWebcam: true
     skipVideoPreview: false
   pingPong:
     clearUsersInSeconds: 180

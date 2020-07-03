@@ -68,6 +68,7 @@ $after-content-order: 3;
 
 .hideOverlay {
   position: absolute !important;
+  left: -1000 px !important;
 }
 
 .floatingOverlay {

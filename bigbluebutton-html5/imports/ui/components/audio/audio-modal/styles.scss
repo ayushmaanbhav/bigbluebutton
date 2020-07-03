@@ -148,8 +148,9 @@
   text-align: center;
   font-weight: 400;
   font-size: 1.3rem;
-  color: var(--color-background);
+  color: var(--color-primary);
   white-space: normal;
+  margin-bottom: 30px;
 
   @include mq($small-only) {
     font-size: 1rem;

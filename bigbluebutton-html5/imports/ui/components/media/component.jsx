@@ -26,7 +26,7 @@ const defaultProps = {
   userWasInWebcam: false,
   audioModalIsOpen: false,
   joinVideo: null,
-  webcamPlacement: 'top',
+  webcamPlacement: 'floating',
 };
 
 
@@ -76,7 +76,7 @@ export default class Media extends Component {
     const overlayClassName = cx({
       [styles.overlay]: true,
       [styles.hideOverlay]: hideOverlay,
-      [styles.floatingOverlay]: (webcamPlacement === 'floating'),
+      // [styles.floatingOverlay]: (webcamPlacement === 'floating'),
     });
 
     return (
@@ -88,7 +88,7 @@ export default class Media extends Component {
         <div
           className={!swapLayout ? contentClassName : overlayClassName}
           style={{
-            maxHeight: usersVideo.length < 1 || (webcamPlacement === 'floating') ? '100%' : '80%',
+            maxHeight: '100%', // usersVideo.length < 1 || (webcamPlacement === 'floating') ? '100%' : '80%',
             minHeight: '20%',
           }}
         >

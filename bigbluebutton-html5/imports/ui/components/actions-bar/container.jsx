@@ -89,8 +89,10 @@ export default withTracker(() => {
     isCaptionsAvailable: CaptionsService.isCaptionsAvailable(),
     isMeteorConnected: Meteor.status().connected,
     isPollingEnabled: POLLING_ENABLED,
-    isThereCurrentPresentation: Presentations.findOne({ meetingId: Auth.meetingID, current: true },
-      { fields: {} }),
+    isThereCurrentPresentation: !!Presentations.findOne(
+      { meetingId: Auth.meetingID, current: true },
+      { fields: {} },
+    ),
     allowExternalVideo: Meteor.settings.public.externalVideoPlayer.enabled,
     isMeetingMuted: isMeetingMuteOnStart(),
     toggleMuteAllUsers,

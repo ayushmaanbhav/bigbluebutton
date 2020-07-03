@@ -200,9 +200,9 @@ class WebcamDraggable extends Component {
 
     if (targetClassname) {
       if (targetClassname.includes('Top')) {
-        webcamDraggableDispatch({ type: 'setplacementToTop' });
+        webcamDraggableDispatch({ type: 'setplacementToFloating' });
       } else if (targetClassname.includes('Bottom')) {
-        webcamDraggableDispatch({ type: 'setplacementToBottom' });
+        webcamDraggableDispatch({ type: 'setplacementToFloating' });
       } else if (singleWebcam) {
         webcamDraggableDispatch(
           {
@@ -229,11 +229,6 @@ class WebcamDraggable extends Component {
       disableVideo,
       audioModalIsOpen,
     } = this.props;
-
-    const { dragging, isCameraFullscreen, videoListSize } = webcamDraggableState;
-    let placement = Storage.getItem('webcamPlacement');
-    const lastPosition = Storage.getItem('webcamLastPosition') || { x: 0, y: 0 };
-    let position = lastPosition;
     const {
       width: mediaWidth,
       height: mediaHeight,
@@ -243,28 +238,34 @@ class WebcamDraggable extends Component {
       width: webcamsWidth,
       height: webcamsHeight,
     } = this.getWebcamsListBounds();
+    const { dragging, isCameraFullscreen, videoListSize } = webcamDraggableState;
+    let placement = 'floating';// Storage.getItem('webcamPlacement');
 
+    const lastPosition = Storage.getItem('webcamLastPosition') || {
+      x: 0,
+      y: 0,
+    };
+
+    let position = lastPosition;
     if (!placement) {
       placement = webcamsDefaultPlacement;
     }
     if (dragging) {
       position = webcamDraggableState.tempPosition;
-    } else if (!dragging && placement === 'floating' && singleWebcam) {
+    } else if (!dragging && placement === 'floating' && singleWebcam && webcamDraggableState.lastPosition.x !== 0) {
       position = webcamDraggableState.lastPosition;
     } else {
       position = {
-        x: (mediaWidth - webcamsWidth) / 2,
+        x: (mediaWidth - webcamsWidth) - 50,
         y: 0,
       };
     }
-
-    if (swapLayout || isCameraFullscreen || BROWSER_ISMOBILE) {
+    if (swapLayout || isCameraFullscreen) {
       position = {
-        x: 0,
+        x: (mediaWidth - (mediaHeight * 4 / 3)) / 2,
         y: 0,
       };
     }
-
 
     const isOverflowWidth = (lastPosition.x + webcamsWidth) > mediaWidth;
     const isOverflowHeight = (lastPosition.y + webcamsHeight) > mediaHeight;
@@ -273,7 +274,7 @@ class WebcamDraggable extends Component {
       x: isOverflowWidth
         && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaWidth - webcamsWidth : position.x,
       y: isOverflowHeight
-        && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaHeight - (webcamsHeight + 1) : position.y,
+      && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaHeight - (webcamsHeight + 1) : position.y,
     };
 
     const contentClassName = cx({
@@ -289,10 +290,10 @@ class WebcamDraggable extends Component {
       [styles.fullWidth]: (singleWebcam
         && (placement === 'top' || placement === 'bottom')
         && !dragging)
-        || !singleWebcam
-        || swapLayout,
+      || !singleWebcam
+      || swapLayout,
       [styles.overlayToTop]: (placement === 'floating' && !singleWebcam)
-        || (placement === 'top' && !dragging),
+      || (placement === 'top' && !dragging),
       [styles.overlayToBottom]: placement === 'bottom' && !dragging,
       [styles.dragging]: dragging,
     });
@@ -370,18 +371,18 @@ class WebcamDraggable extends Component {
                 : contentClassName}
             style={{
               marginLeft: singleWebcam
-                && !(placement === 'bottom' || placement === 'top')
+              && !(placement === 'bottom' || placement === 'top')
                 ? 10
                 : 0,
               marginRight: singleWebcam
-                && !(placement === 'bottom' || placement === 'top')
-                ? 10
+              && !(placement === 'bottom' || placement === 'top')
+                ? 30
                 : 0,
             }}
           >
             {
               !disableVideo
-                && !audioModalIsOpen
+              && !audioModalIsOpen
                 ? (
                   <VideoProviderContainer
                     swapLayout={swapLayout}

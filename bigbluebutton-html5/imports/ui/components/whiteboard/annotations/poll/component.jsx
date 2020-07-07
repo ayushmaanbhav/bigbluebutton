@@ -456,7 +456,7 @@ class PollDrawComponent extends Component {
           y={innerRect.y}
           width={innerRect.width}
           height={innerRect.height}
-          stroke="#333333"
+          stroke="var(--color-primary)"
           fill={backgroundColor}
           strokeWidth={thickness}
         />
@@ -510,8 +510,8 @@ class PollDrawComponent extends Component {
             y={line.barColumn.yBar}
             width={line.barColumn.barWidth}
             height={line.barColumn.barHeight}
-            stroke="#333333"
-            fill="#333333"
+            stroke={line.barColumn.barWidth === maxBarWidth ? 'var(--color-success)' : 'var(--color-primary)'}
+            fill={line.barColumn.barWidth === maxBarWidth ? 'var(--color-success)' : 'var(--color-primary)'}
             strokeWidth={thickness - 1}
           />
         ))}
@@ -624,22 +624,7 @@ class PollDrawComponent extends Component {
           ref={(ref) => { this[`${annotation.id}_digit`] = ref; }}
         >
           <tspan>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            0
+            {'0'}
           </tspan>
         </text>
       </g>

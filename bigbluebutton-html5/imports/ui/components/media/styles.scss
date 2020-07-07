@@ -87,6 +87,11 @@ $after-content-order: 3;
   max-width: 100%;
 }
 
+.autoWidthMulti{
+  min-width: calc(var(--video-height) * var(--video-ratio)  * 2) !important;
+  max-width: 100%;
+}
+
 .fullWidth {
   width: 100% !important;
   min-width: 100% !important;

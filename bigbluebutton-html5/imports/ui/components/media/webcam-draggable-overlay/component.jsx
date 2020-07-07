@@ -227,6 +227,7 @@ class WebcamDraggable extends Component {
       disableVideo,
       audioModalIsOpen,
     } = this.props;
+
     const {
       width: mediaWidth,
       height: mediaHeight,
@@ -285,7 +286,8 @@ class WebcamDraggable extends Component {
       [styles.overlay]: true,
       [styles.hideOverlay]: hideOverlay,
       [styles.floatingOverlay]: (placement === 'floating') || dragging,
-      [styles.autoWidth]: true,
+      [styles.autoWidth]: singleWebcam,
+      [styles.autoWidthMulti]: !singleWebcam,
       // [styles.fullWidth]: (
       //   singleWebcam
       //   && (placement === 'top' || placement === 'bottom')

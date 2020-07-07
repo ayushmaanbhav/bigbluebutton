@@ -461,6 +461,7 @@ class PresentationArea extends PureComponent {
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
           className={styles.svgStyles}
+          direction="ltr"
         >
           <defs>
             <clipPath id="viewBox">

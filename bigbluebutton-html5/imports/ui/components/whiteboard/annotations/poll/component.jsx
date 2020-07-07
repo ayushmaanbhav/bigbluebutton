@@ -322,7 +322,7 @@ class PollDrawComponent extends Component {
 
     const { pollAnswerIds } = PollService;
 
-    const isRTL = true;// document.documentElement.getAttribute('dir') === 'rtl';
+    const isRTL = false;// document.documentElement.getAttribute('dir') === 'rtl';
 
     //* ********************************************************************************************
     //* *****************************************MAGIC NUMBER***************************************

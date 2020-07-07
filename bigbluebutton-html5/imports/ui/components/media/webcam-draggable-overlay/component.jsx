@@ -179,14 +179,13 @@ class WebcamDraggable extends Component {
   async handleWebcamDragStart() {
     const { webcamDraggableDispatch, singleWebcam } = this.props;
     const { x, y } = await this.calculatePosition();
-
     webcamDraggableDispatch({ type: 'dragStart' });
 
     webcamDraggableDispatch(
       {
         type: 'setTempPosition',
         value: {
-          x: singleWebcam ? x : 0,
+          x,
           y,
         },
       },
@@ -194,28 +193,27 @@ class WebcamDraggable extends Component {
   }
 
   handleWebcamDragStop(e, position) {
-    const { webcamDraggableDispatch, singleWebcam } = this.props;
-    const targetClassname = JSON.stringify(e.target.className);
+    const { webcamDraggableDispatch } = this.props;
     const { x, y } = position;
-
-    if (targetClassname) {
-      if (targetClassname.includes('Top')) {
-        webcamDraggableDispatch({ type: 'setplacementToFloating' });
-      } else if (targetClassname.includes('Bottom')) {
-        webcamDraggableDispatch({ type: 'setplacementToFloating' });
-      } else if (singleWebcam) {
-        webcamDraggableDispatch(
-          {
-            type: 'setLastPosition',
-            value: {
-              x,
-              y,
-            },
-          },
-        );
-        webcamDraggableDispatch({ type: 'setplacementToFloating' });
-      }
-    }
+    webcamDraggableDispatch(
+      {
+        type: 'setLastPosition',
+        value: {
+          x,
+          y,
+        },
+      },
+    );
+    // webcamDraggableDispatch({ type: 'setplacementToFloating' });
+    // if (targetClassname) {
+    //   if (targetClassname.includes('Top')) {
+    //     webcamDraggableDispatch({ type: 'setplacementToFloating' });
+    //   } else if (targetClassname.includes('Bottom')) {
+    //     webcamDraggableDispatch({ type: 'setplacementToFloating' });
+    //   } else if (singleWebcam) {
+    //
+    //   }
+    // }
     webcamDraggableDispatch({ type: 'dragEnd' });
     window.dispatchEvent(new Event('resize'));
   }
@@ -252,7 +250,7 @@ class WebcamDraggable extends Component {
     }
     if (dragging) {
       position = webcamDraggableState.tempPosition;
-    } else if (!dragging && placement === 'floating' && singleWebcam && webcamDraggableState.lastPosition.x !== 0) {
+    } else if (!dragging && placement === 'floating' && webcamDraggableState.lastPosition.x !== 0) {
       position = webcamDraggableState.lastPosition;
     } else {
       position = {
@@ -276,6 +274,7 @@ class WebcamDraggable extends Component {
       y: isOverflowHeight
       && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaHeight - (webcamsHeight + 1) : position.y,
     };
+    console.log('Final Position', position);
 
     const contentClassName = cx({
       [styles.content]: true,
@@ -285,17 +284,17 @@ class WebcamDraggable extends Component {
     const overlayClassName = cx({
       [styles.overlay]: true,
       [styles.hideOverlay]: hideOverlay,
-      [styles.floatingOverlay]: (singleWebcam && placement === 'floating') || dragging,
-      [styles.autoWidth]: singleWebcam,
-      [styles.fullWidth]: (singleWebcam
-        && (placement === 'top' || placement === 'bottom')
-        && !dragging)
-      || !singleWebcam
-      || swapLayout,
-      [styles.overlayToTop]: (placement === 'floating' && !singleWebcam)
-      || (placement === 'top' && !dragging),
-      [styles.overlayToBottom]: placement === 'bottom' && !dragging,
-      [styles.dragging]: dragging,
+      [styles.floatingOverlay]: (placement === 'floating') || dragging,
+      [styles.autoWidth]: true,
+      // [styles.fullWidth]: (
+      //   singleWebcam
+      //   && (placement === 'top' || placement === 'bottom')
+      //   && !dragging)
+      // || !singleWebcam   || swapLayout,
+    //   [styles.overlayToTop]: (placement === 'floating' && !singleWebcam)
+    //   || (placement === 'top' && !dragging),
+    //   [styles.overlayToBottom]: placement === 'bottom' && !dragging,
+    //   [styles.dragging]: dragging,
     });
 
     // const dropZoneTopClassName = cx({
@@ -337,7 +336,7 @@ class WebcamDraggable extends Component {
           onStart={this.handleWebcamDragStart}
           onStop={this.handleWebcamDragStop}
           onMouseDown={e => e.preventDefault()}
-          disabled={swapLayout || isCameraFullscreen || BROWSER_ISMOBILE}
+          disabled={swapLayout || isCameraFullscreen}
           position={position}
         >
           <Resizable

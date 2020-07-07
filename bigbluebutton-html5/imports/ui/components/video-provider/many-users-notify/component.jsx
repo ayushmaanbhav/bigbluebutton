@@ -77,7 +77,7 @@ class LockViewersNotifyComponent extends Component {
               onClick={toggleWebcamsOnlyForModerator}
               className={styles.button}
             />
-            |
+            {'|'}
             <Button
               label={intl.formatMessage(intlMessages.cancel)}
               aria-label={intl.formatMessage(intlMessages.cancel)}

@@ -322,7 +322,7 @@ class PollDrawComponent extends Component {
 
     const { pollAnswerIds } = PollService;
 
-    const isRTL = document.documentElement.getAttribute('dir') === 'rtl';
+    const isRTL = false;// document.documentElement.getAttribute('dir') === 'rtl';
 
     //* ********************************************************************************************
     //* *****************************************MAGIC NUMBER***************************************
@@ -361,7 +361,7 @@ class PollDrawComponent extends Component {
 
     let yNumVotes = (innerRect.y + verticalPadding) - magicNumber;
 
-    let questionText = undefined;
+    let questionText;
     if (annotation.question) {
       questionText = {
         key: `${annotation.id}_${textArray[annotation.result.length][3]}`,
@@ -371,7 +371,7 @@ class PollDrawComponent extends Component {
           yLeft,
         },
       };
-      
+
       yBar = yBar + barHeight + verticalPadding;
       yLeft = yLeft + barHeight + verticalPadding;
       yRight = yRight + barHeight + verticalPadding;
@@ -461,7 +461,8 @@ class PollDrawComponent extends Component {
           strokeWidth={thickness}
         />
         {questionText
-          ? <text
+          ? (
+            <text
               x={innerRect.x}
               y={innerRect.y}
               fill="#333333"
@@ -479,6 +480,7 @@ class PollDrawComponent extends Component {
                 {questionText.keyColumn.keyString}
               </tspan>
             </text>
+          )
           : null
         }
         <text
@@ -622,6 +624,21 @@ class PollDrawComponent extends Component {
           ref={(ref) => { this[`${annotation.id}_digit`] = ref; }}
         >
           <tspan>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             0
           </tspan>
         </text>

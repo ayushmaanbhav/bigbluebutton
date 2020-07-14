@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import WhiteboardOverlayContainer from '/imports/ui/components/whiteboard/whiteboard-overlay/container';
-import WhiteboardToolbarContainer from '/imports/ui/components/whiteboard/whiteboard-toolbar/container';
+import WhiteboardOverlayContainer
+  from '/imports/ui/components/whiteboard/whiteboard-overlay/container';
+import WhiteboardToolbarContainer
+  from '/imports/ui/components/whiteboard/whiteboard-toolbar/container';
 import { HUNDRED_PERCENT, MAX_PERCENT } from '/imports/utils/slideCalcUtils';
 import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import PresentationToolbarContainer from './presentation-toolbar/container';
@@ -164,7 +166,10 @@ class PresentationArea extends PureComponent {
       // and we have to get the width/height of the refWhiteboardArea
       // (inner hidden div with absolute position)
       if (userIsPresenter || multiUser) {
-        ({ clientWidth, clientHeight } = refWhiteboardArea);
+        ({
+          clientWidth,
+          clientHeight,
+        } = refWhiteboardArea);
       }
 
       presentationSizes.presentationAreaHeight = clientHeight - this.getToolbarHeight();
@@ -218,7 +223,10 @@ class PresentationArea extends PureComponent {
     } = this.props;
 
     if (!currentSlide || !slidePosition) {
-      return { width: 0, height: 0 };
+      return {
+        width: 0,
+        height: 0,
+      };
     }
 
     const originalWidth = slidePosition.width;
@@ -296,7 +304,10 @@ class PresentationArea extends PureComponent {
   updateLocalPosition(x, y, width, height, zoom) {
     this.setState({
       localPosition: {
-        x, y, width, height,
+        x,
+        y,
+        width,
+        height,
       },
       zoom,
     });
@@ -456,7 +467,11 @@ class PresentationArea extends PureComponent {
           data-test="whiteboard"
           width={svgDimensions.width}
           height={svgDimensions.height}
-          ref={(ref) => { if (ref != null) { this.svggroup = ref; } }}
+          ref={(ref) => {
+            if (ref != null) {
+              this.svggroup = ref;
+            }
+          }}
           viewBox={svgViewBox}
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
@@ -465,7 +480,13 @@ class PresentationArea extends PureComponent {
         >
           <defs>
             <clipPath id="viewBox">
-              <rect x={viewBoxPosition.x} y={viewBoxPosition.y} width="100%" height="100%" fill="none" />
+              <rect
+                x={viewBoxPosition.x}
+                y={viewBoxPosition.y}
+                width="100%"
+                height="100%"
+                fill="none"
+              />
             </clipPath>
           </defs>
           <g clipPath="url(#viewBox)">
@@ -635,21 +656,27 @@ class PresentationArea extends PureComponent {
 
     return (
       <div
-        ref={(ref) => { this.refPresentationContainer = ref; }}
+        ref={(ref) => {
+          this.refPresentationContainer = ref;
+        }}
         className={styles.presentationContainer}
       >
         <div
-          ref={(ref) => { this.refPresentationArea = ref; }}
+          ref={(ref) => {
+            this.refPresentationArea = ref;
+          }}
           className={styles.presentationArea}
         >
           <div
-            ref={(ref) => { this.refWhiteboardArea = ref; }}
+            ref={(ref) => {
+              this.refWhiteboardArea = ref;
+            }}
             className={styles.whiteboardSizeAvailable}
           />
           <div
             className={styles.svgContainer}
             style={{
-              height: svgDimensions.height + 36,
+              height: svgDimensions.height + toolbarHeight,
             }}
           >
             {showSlide
@@ -662,7 +689,9 @@ class PresentationArea extends PureComponent {
               ? (
                 <div
                   className={styles.presentationToolbar}
-                  ref={(ref) => { this.refPresentationToolbar = ref; }}
+                  ref={(ref) => {
+                    this.refPresentationToolbar = ref;
+                  }}
                   style={
                     {
                       width: toolbarWidth,

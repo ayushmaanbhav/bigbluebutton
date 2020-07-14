@@ -275,7 +275,6 @@ class WebcamDraggable extends Component {
       y: isOverflowHeight
       && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaHeight - (webcamsHeight + 1) : position.y,
     };
-    console.log('Final Position', position);
 
     const contentClassName = cx({
       [styles.content]: true,

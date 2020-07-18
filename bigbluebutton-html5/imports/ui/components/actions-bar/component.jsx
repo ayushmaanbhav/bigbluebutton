@@ -136,7 +136,7 @@ class ActionsBar extends PureComponent {
         </div>
         <div className={cx(actionBarClasses)}>
           <AudioControlsContainer className={styles.hiddenControls} />
-          {enableVideo
+          {enableVideo && amIModerator
             ? (
               <JoinVideoOptionsContainer
                 handleJoinVideo={handleJoinVideo}

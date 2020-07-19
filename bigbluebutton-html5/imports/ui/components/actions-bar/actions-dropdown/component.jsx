@@ -25,7 +25,7 @@ const propTypes = {
   allowExternalVideo: PropTypes.bool.isRequired,
   stopExternalVideoShare: PropTypes.func.isRequired,
   isMeetingMuted: PropTypes.bool.isRequired,
-  toggleMuteAllUsers: PropTypes.func.isRequired,
+  toggleMuteAllUsersExceptPresenter: PropTypes.func.isRequired,
 };
 
 const defaultProps = {
@@ -77,13 +77,13 @@ const intlMessages = defineMessages({
     id: 'app.actionsBar.actionsDropdown.stopShareExternalVideo',
     description: 'Stop sharing external video button',
   },
-  muteAllLabel: {
-    id: 'app.userList.userOptions.muteAllLabel',
-    description: 'Mute all label',
+  muteAllExceptPresenterLabel: {
+    id: 'app.userList.userOptions.muteAllExceptPresenterLabel',
+    description: 'Mute all except presenter label',
   },
-  muteAllDesc: {
-    id: 'app.userList.userOptions.muteAllDesc',
-    description: 'Mute all description',
+  muteAllExceptPresenterDesc: {
+    id: 'app.userList.userOptions.muteAllExceptPresenterDesc',
+    description: 'Mute all except presenter description',
   },
   unmuteAllLabel: {
     id: 'app.userList.userOptions.unmuteAllLabel',
@@ -128,7 +128,7 @@ class ActionsDropdown extends PureComponent {
       isPollingEnabled,
       stopExternalVideoShare,
       isMeetingMuted,
-      toggleMuteAllUsers,
+      toggleMuteAllUsersExceptPresenter,
     } = this.props;
 
     const {
@@ -150,9 +150,9 @@ class ActionsDropdown extends PureComponent {
           <DropdownListItem
             key={this.muteAllId}
             icon={isMeetingMuted ? 'unmute' : 'mute'}
-            label={intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllLabel' : 'muteAllLabel'])}
-            description={intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllDesc' : 'muteAllDesc'])}
-            onClick={toggleMuteAllUsers}
+            label={intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllLabel' : 'muteAllExceptPresenterLabel'])}
+            description={intl.formatMessage(intlMessages[isMeetingMuted ? 'unmuteAllDesc' : 'muteAllExceptPresenterDesc'])}
+            onClick={toggleMuteAllUsersExceptPresenter}
           />
         )
         : null

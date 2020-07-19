@@ -176,54 +176,54 @@ class LockViewersComponent extends Component {
               <div className={styles.bold}>{intl.formatMessage(intlMessages.featuresLable)}</div>
               <div className={styles.bold}>{intl.formatMessage(intlMessages.lockStatusLabel)}</div>
             </header>
-            <div className={styles.row}>
-              <div className={styles.col} aria-hidden="true">
-                <div className={styles.formElement}>
-                  <div className={styles.label}>
-                    {intl.formatMessage(intlMessages.webcamLabel)}
-                  </div>
-                </div>
-              </div>
-              <div className={styles.col}>
-                <div className={cx(styles.formElement, styles.pullContentRight)}>
-                  {this.displayLockStatus(lockSettingsProps.disableCam)}
-                  <Toggle
-                    icons={false}
-                    defaultChecked={lockSettingsProps.disableCam}
-                    onChange={() => {
-                      this.toggleLockSettings('disableCam');
-                    }}
-                    ariaLabel={intl.formatMessage(intlMessages.webcamLabel)}
-                    showToggleLabel={showToggleLabel}
-                    invertColors={invertColors}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className={styles.row}>
-              <div className={styles.col} aria-hidden="true">
-                <div className={styles.formElement}>
-                  <div className={styles.label}>
-                    {intl.formatMessage(intlMessages.otherViewersWebcamLabel)}
-                  </div>
-                </div>
-              </div>
-              <div className={styles.col}>
-                <div className={cx(styles.formElement, styles.pullContentRight)}>
-                  {this.displayLockStatus(usersProp.webcamsOnlyForModerator)}
-                  <Toggle
-                    icons={false}
-                    defaultChecked={usersProp.webcamsOnlyForModerator}
-                    onChange={() => {
-                      this.toggleUserProps('webcamsOnlyForModerator');
-                    }}
-                    ariaLabel={intl.formatMessage(intlMessages.otherViewersWebcamLabel)}
-                    showToggleLabel={showToggleLabel}
-                    invertColors={invertColors}
-                  />
-                </div>
-              </div>
-            </div>
+            {/* <div className={styles.row}> */}
+            {/*  <div className={styles.col} aria-hidden="true"> */}
+            {/*    <div className={styles.formElement}> */}
+            {/*      <div className={styles.label}> */}
+            {/*        {intl.formatMessage(intlMessages.webcamLabel)} */}
+            {/*      </div> */}
+            {/*    </div> */}
+            {/*  </div> */}
+            {/*  <div className={styles.col}> */}
+            {/*    <div className={cx(styles.formElement, styles.pullContentRight)}> */}
+            {/*      {this.displayLockStatus(lockSettingsProps.disableCam)} */}
+            {/*      <Toggle */}
+            {/*        icons={false} */}
+            {/*        defaultChecked={lockSettingsProps.disableCam} */}
+            {/*        onChange={() => { */}
+            {/*          this.toggleLockSettings('disableCam'); */}
+            {/*        }} */}
+            {/*        ariaLabel={intl.formatMessage(intlMessages.webcamLabel)} */}
+            {/*        showToggleLabel={showToggleLabel} */}
+            {/*        invertColors={invertColors} */}
+            {/*      /> */}
+            {/*    </div> */}
+            {/*  </div> */}
+            {/* </div> */}
+            {/* <div className={styles.row}> */}
+            {/*  <div className={styles.col} aria-hidden="true"> */}
+            {/*    <div className={styles.formElement}> */}
+            {/*      <div className={styles.label}> */}
+            {/*        {intl.formatMessage(intlMessages.otherViewersWebcamLabel)} */}
+            {/*      </div> */}
+            {/*    </div> */}
+            {/*  </div> */}
+            {/*  <div className={styles.col}> */}
+            {/*    <div className={cx(styles.formElement, styles.pullContentRight)}> */}
+            {/*      {this.displayLockStatus(usersProp.webcamsOnlyForModerator)} */}
+            {/*      <Toggle */}
+            {/*        icons={false} */}
+            {/*        defaultChecked={usersProp.webcamsOnlyForModerator} */}
+            {/*        onChange={() => { */}
+            {/*          this.toggleUserProps('webcamsOnlyForModerator'); */}
+            {/*        }} */}
+            {/*        ariaLabel={intl.formatMessage(intlMessages.otherViewersWebcamLabel)} */}
+            {/*        showToggleLabel={showToggleLabel} */}
+            {/*        invertColors={invertColors} */}
+            {/*      /> */}
+            {/*    </div> */}
+            {/*  </div> */}
+            {/* </div> */}
             <div className={styles.row}>
               <div className={styles.col} aria-hidden="true">
                 <div className={styles.formElement}>

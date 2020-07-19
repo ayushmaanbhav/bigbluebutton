@@ -83,7 +83,7 @@ class ActionsBar extends PureComponent {
       isThereCurrentPresentation,
       allowExternalVideo,
       isMeetingMuted,
-      toggleMuteAllUsers,
+      toggleMuteAllUsersExceptPresenter,
       isExpanded,
       shortcuts: TOGGLE_USERLIST_AK,
       hasUnreadMessages,
@@ -112,7 +112,7 @@ class ActionsBar extends PureComponent {
             stopExternalVideoShare,
             isMeteorConnected,
             isMeetingMuted,
-            toggleMuteAllUsers,
+            toggleMuteAllUsersExceptPresenter,
           }}
           />
           {isPollingEnabled

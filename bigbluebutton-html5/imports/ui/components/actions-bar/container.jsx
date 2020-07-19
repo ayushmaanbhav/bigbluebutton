@@ -56,15 +56,15 @@ export default withTracker(() => {
     return muteOnStart;
   };
 
-  const toggleMuteAllUsers = () => {
-    UserListService.muteAllUsers(Auth.userID);
+  const toggleMuteAllUsersExceptPresenter = () => {
+    UserListService.muteAllExceptPresenter(Auth.userID);
     if (isMeetingMuteOnStart()) {
       return meetingMuteDisabledLog();
     }
     return logger.info({
-      logCode: 'useroptions_mute_all',
+      logCode: 'useroptions_mute_all_except_presenter',
       extraInfo: { logType: 'moderator_action' },
-    }, 'moderator enabled meeting mute, all users muted');
+    }, 'moderator enabled meeting mute, all users muted except presenter');
   };
 
   return {
@@ -90,12 +90,15 @@ export default withTracker(() => {
     isMeteorConnected: Meteor.status().connected,
     isPollingEnabled: POLLING_ENABLED,
     isThereCurrentPresentation: !!Presentations.findOne(
-      { meetingId: Auth.meetingID, current: true },
+      {
+        meetingId: Auth.meetingID,
+        current: true,
+      },
       { fields: {} },
     ),
     allowExternalVideo: Meteor.settings.public.externalVideoPlayer.enabled,
     isMeetingMuted: isMeetingMuteOnStart(),
-    toggleMuteAllUsers,
+    toggleMuteAllUsersExceptPresenter,
     isExpanded,
     currentUserId: Auth.userID,
     hasUnreadMessages,

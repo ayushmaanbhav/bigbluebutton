@@ -202,7 +202,7 @@ br{
 
 #thumbnails .thumbnail-label {
 	color: #fff;
-	background: #3A87AD;
+	background: #52056D;
 	font-weight: bold;
 	font-size: 12px;
 	position: absolute;
@@ -253,4 +253,7 @@ br{
 	left: 50%;
 	margin-left: -100px;
 	top:60%;
+}
+a{
+	color: #52056D;
 }

@@ -9550,7 +9550,7 @@ UA.prototype.loadConfig = function(configuration) {
       userAgentString: SIP.C.USER_AGENT,
 
       // Session parameters
-      iceCheckingTimeout: 5000,
+      iceCheckingTimeout: 1000,
       noAnswerTimeout: 60,
       stunServers: [],
       turnServers: [],
@@ -11665,7 +11665,7 @@ MediaHandler.prototype = Object.create(SIP.MediaHandler.prototype, {
         if (self.session.ua.configuration.hackStripTcp) {
           sdpWrapper.sdp = sdpWrapper.sdp.replace(/^a=candidate:\d+ \d+ tcp .*?\r\n/img, "");
         }
-        
+
         // Ensure that this block is after all other SDP manipulations
         var localSdpCallback = self.session.ua.configuration.localSdpCallback;
         if (localSdpCallback && typeof localSdpCallback === 'function') {
@@ -11778,7 +11778,7 @@ MediaStreamManager.render = function render (streams, elements) {
       let logObject = {};
       if (logCode) logObject.logCode = logCode;
       if (extraInfo) logObject.extraInfo = extraInfo;
-      
+
       window.clientLogger[logType](logObject, message);
     }
   }
@@ -11796,7 +11796,7 @@ MediaStreamManager.render = function render (streams, elements) {
     var audioContext = new AudioContext();
 
     audioContext.createMediaStreamSource(stream).connect(audioContext.destination);
-    
+
     audioContext.onstatechange = function() {
       sendLog("info", "sipjs_audiocontext_state_change", `Audio context state change, new state: ${audioContext.state}`, {state: audioContext.state});
     };
@@ -11830,7 +11830,7 @@ MediaStreamManager.render = function render (streams, elements) {
       document.body.appendChild(promptDiv)
     });
   }
-  
+
   function attachMediaStream(element, stream) {
     element.srcObject = stream;
   }
@@ -11881,7 +11881,7 @@ MediaStreamManager.render = function render (streams, elements) {
         if (error.name === "NotAllowedError") {
           if (fallenBack) return;
           sendLog("info", "sipjs_audioelement_play_error", `The audio element encountered an error on play: ${error.name}`, {errorCode: error.name});
-          
+
           var savedStyle = document.getElementById("app").style;
           document.getElementById("app").style = "display: none";
           document.body.style = "display: flex; align-items: center; width: 100%; justify-content: center";

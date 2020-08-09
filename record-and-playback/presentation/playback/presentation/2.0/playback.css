@@ -180,7 +180,7 @@ body {
   font-size: 1.45rem;
   padding-top: 8px;
   margin: 0;
-  color: #666666;
+  color: #52056D;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
@@ -193,7 +193,7 @@ body {
   padding-left: 15px;
   border-right: 1px solid #e2e2e2;
   float: left;
-  color: #666;
+  color: #52056D;
   padding-top: 8px;
   height: 48px;
 }
@@ -253,10 +253,10 @@ body {
 }
 #thumbnails .thumbnail-wrapper.active img,
 #thumbnails .thumbnail-wrapper.active:hover img {
-	border-color: #289ad6; /* #314b5d; */
+	border-color: #52056D; /* #314b5d; */
 }
 #thumbnails .thumbnail-wrapper:hover img {
-	border-color: #289ad6; /* #314b5d; */
+	border-color: #52056D; /* #314b5d; */
 }
 #thumbnails img {
   max-height: 125px;
@@ -268,7 +268,7 @@ body {
 }
 #thumbnails .thumbnail-label {
 	color: #fff;
-	background: #289ad6;
+	background: #52056D;
 	font-weight: bold;
 	font-size: 12px;
 	position: absolute;
@@ -299,7 +299,7 @@ body {
   transform: translate3d(13rem, 0, 0);
 }
 ul.off-canvas-list li label {
-  background: #2a2d34;
+  background: #52056D;
   color: #eee;
 }
 .exit-off-canvas {
@@ -445,4 +445,8 @@ ul.off-canvas-list li label {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+a{
+  color: #52056D;
 }

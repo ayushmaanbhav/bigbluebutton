@@ -454,8 +454,8 @@ class PresentationArea extends PureComponent {
       <div
         dir="rtl"
         style={{
-          width: svgDimensions.width,
-          height: svgDimensions.height,
+          width: svgDimensions.width < 0 ? 0 : svgDimensions.width,
+          height: svgDimensions.height < 0 ? 0 : svgDimensions.height,
         }}
         className={styles.slidesContainer}
       >
@@ -465,13 +465,9 @@ class PresentationArea extends PureComponent {
         <svg
           key={currentSlide.id}
           data-test="whiteboard"
-          width={svgDimensions.width}
-          height={svgDimensions.height}
-          ref={(ref) => {
-            if (ref != null) {
-              this.svggroup = ref;
-            }
-          }}
+          width={svgDimensions.width < 0 ? 0 : svgDimensions.width}
+          height={svgDimensions.height < 0 ? 0 : svgDimensions.height}
+          ref={(ref) => { if (ref != null) { this.svggroup = ref; } }}
           viewBox={svgViewBox}
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"

@@ -9,7 +9,6 @@ import Presentations from '/imports/api/presentations';
 import { Session } from 'meteor/session';
 import ActionsBar from './component';
 import Service from './service';
-import VideoService from '../video-provider/service';
 import ExternalVideoService from '/imports/ui/components/external-video-player/service';
 import CaptionsService from '/imports/ui/components/captions/service';
 import Meetings from '/imports/api/meetings';
@@ -71,8 +70,6 @@ export default withTracker(() => {
     amIPresenter: Service.amIPresenter(),
     amIModerator: Service.amIModerator(),
     stopExternalVideoShare: ExternalVideoService.stopWatching,
-    handleExitVideo: () => VideoService.exitVideo(),
-    handleJoinVideo: () => VideoService.joinVideo(),
     handleShareScreen: onFail => shareScreen(onFail),
     handleUnshareScreen: () => unshareScreen(),
     isVideoBroadcasting: isVideoBroadcasting(),

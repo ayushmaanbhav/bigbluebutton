@@ -59,8 +59,6 @@ class ActionsBar extends PureComponent {
   render() {
     const {
       amIPresenter,
-      handleExitVideo,
-      handleJoinVideo,
       handleShareScreen,
       handleUnshareScreen,
       isVideoBroadcasting,

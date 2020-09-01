@@ -150,6 +150,39 @@ const intlMessages = defineMessages({
 });
 
 class VideoPreview extends Component {
+  constructor(props) {
+    super(props);
+
+    const {
+      webcamDeviceId,
+    } = props;
+
+    this.handleProceed = this.handleProceed.bind(this);
+    this.handleStartSharing = this.handleStartSharing.bind(this);
+    this.handleStopSharing = this.handleStopSharing.bind(this);
+    this.handleStopSharingAll = this.handleStopSharingAll.bind(this);
+    this.handleSelectWebcam = this.handleSelectWebcam.bind(this);
+    this.handleSelectProfile = this.handleSelectProfile.bind(this);
+
+    this.deviceStream = null;
+
+    this._isMounted = false;
+
+    this.state = {
+      webcamDeviceId,
+      availableWebcams: null,
+      availableProfiles: {},
+      selectedProfile: null,
+      isStartSharingDisabled: true,
+      viewState: VIEW_STATES.finding,
+      deviceError: null,
+      previewError: null,
+    };
+
+    this.mirrorOwnWebcam = VideoService.mirrorOwnWebcam();
+    this.userParameterProfile = VideoService.getUserParameterProfile();
+  }
+
   static handleGUMError(error) {
     // logger.error(error);
     // logger.error(error.id);
@@ -193,39 +226,6 @@ class VideoPreview extends Component {
     } */
 
     return `${error.name}: ${error.message}`;
-  }
-
-  constructor(props) {
-    super(props);
-
-    const {
-      webcamDeviceId,
-    } = props;
-
-    this.handleProceed = this.handleProceed.bind(this);
-    this.handleStartSharing = this.handleStartSharing.bind(this);
-    this.handleStopSharing = this.handleStopSharing.bind(this);
-    this.handleStopSharingAll = this.handleStopSharingAll.bind(this);
-    this.handleSelectWebcam = this.handleSelectWebcam.bind(this);
-    this.handleSelectProfile = this.handleSelectProfile.bind(this);
-
-    this.deviceStream = null;
-
-    this._isMounted = false;
-
-    this.state = {
-      webcamDeviceId,
-      availableWebcams: null,
-      availableProfiles: {},
-      selectedProfile: null,
-      isStartSharingDisabled: true,
-      viewState: VIEW_STATES.finding,
-      deviceError: null,
-      previewError: null,
-    };
-
-    this.mirrorOwnWebcam = VideoService.mirrorOwnWebcam();
-    this.userParameterProfile = VideoService.getUserParameterProfile();
   }
 
   componentDidMount() {
@@ -372,9 +372,7 @@ class VideoPreview extends Component {
     }
   }
 
-  handleSelectWebcam(event) {
-    const webcamValue = event.target.value;
-
+  handleSelectWebcam(webcamValue) {
     this.displayInitialPreview(webcamValue);
   }
 
@@ -551,7 +549,7 @@ class VideoPreview extends Component {
             </span>
           )
           : (
-            <span>
+            <>
               <label className={styles.label} htmlFor="setQuality">
                 {intl.formatMessage(intlMessages.qualityLabel)}
               </label>
@@ -584,7 +582,7 @@ class VideoPreview extends Component {
                   </span>
                 )
               }
-            </span>
+            </>
           )
         }
       </div>

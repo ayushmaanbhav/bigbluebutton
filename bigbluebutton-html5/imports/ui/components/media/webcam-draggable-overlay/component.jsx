@@ -261,7 +261,7 @@ class WebcamDraggable extends Component {
     }
     if (swapLayout || isCameraFullscreen) {
       position = {
-        x: (mediaWidth - (mediaHeight * 4 / 3)) / 2,
+        x: Math.abs(mediaWidth - webcamsWidth) / 2,
         y: 0,
       };
     }
@@ -271,7 +271,7 @@ class WebcamDraggable extends Component {
 
     position = {
       x: isOverflowWidth
-        && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaWidth - webcamsWidth : position.x,
+      && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaWidth - webcamsWidth : position.x,
       y: isOverflowHeight
       && !dragging && !swapLayout && singleWebcam && placement === 'floating' ? mediaHeight - (webcamsHeight + 1) : position.y,
     };
@@ -292,10 +292,10 @@ class WebcamDraggable extends Component {
       //   && (placement === 'top' || placement === 'bottom')
       //   && !dragging)
       // || !singleWebcam   || swapLayout,
-    //   [styles.overlayToTop]: (placement === 'floating' && !singleWebcam)
-    //   || (placement === 'top' && !dragging),
-    //   [styles.overlayToBottom]: placement === 'bottom' && !dragging,
-    //   [styles.dragging]: dragging,
+      //   [styles.overlayToTop]: (placement === 'floating' && !singleWebcam)
+      //   || (placement === 'top' && !dragging),
+      //   [styles.overlayToBottom]: placement === 'bottom' && !dragging,
+      //   [styles.dragging]: dragging,
     });
 
     // const dropZoneTopClassName = cx({

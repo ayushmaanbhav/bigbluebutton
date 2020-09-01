@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+import Settings from '/imports/ui/services/settings';
 import WebcamDraggable from './webcam-draggable-overlay/component';
 
 import { styles } from './styles';
@@ -58,6 +59,9 @@ export default class Media extends Component {
       [styles.hideOverlay]: hideOverlay,
       // [styles.floatingOverlay]: (webcamPlacement === 'floating'),
     });
+
+    const { viewParticipantsWebcams } = Settings.dataSaving;
+    const fullHeight = usersVideo.length < 1 || (webcamPlacement === 'floating') || !viewParticipantsWebcams;
 
     return (
       <div

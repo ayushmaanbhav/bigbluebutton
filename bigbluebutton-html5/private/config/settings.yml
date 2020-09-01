@@ -116,59 +116,59 @@ public:
         - window
         - screen
       firefoxScreenshareSource: window
+    # cameraProfiles is an array of:
+    # - id: profile identifier
+    #   name: human-readable profile name
+    #   bitrate
+    #   hidden: whether this profile will be hidden in the video preview dropdown
+    #   constraints: a video media constraints dictionary (without the video key)
     cameraProfiles:
       - id: low-u30
         name: low-u30
         bitrate: 30
         hidden: true
         constraints:
-           video:
-              frameRate: 3
+          frameRate: 3
       - id: low-u25
         name: low-u25
         bitrate: 40
         hidden: true
         constraints:
-           video:
-              frameRate: 3
+          frameRate: 3
       - id: low-u20
         name: low-u20
         bitrate: 50
         hidden: true
         constraints:
-           video:
-              frameRate: 5
+          frameRate: 5
       - id: low-u15
         name: low-u15
         bitrate: 70
         hidden: true
         constraints:
-           video:
-              frameRate: 8
+          frameRate: 8
       - id: low-u12
         name: low-u12
         bitrate: 90
         hidden: true
         constraints:
-           video:
-              frameRate: 10
+          frameRate: 10
       - id: low-u8
         name: low-u8
         bitrate: 100
         hidden: true
         constraints:
-           video:
-              frameRate: 10
+          frameRate: 10
       - id: low
-        name: Low quality
+        name: Low
         default: false
         bitrate: 100
       - id: medium
-        name: Medium quality
+        name: Medium
         default: true
         bitrate: 200
       - id: high
-        name: High quality
+        name: High
         default: false
         bitrate: 500
       - id: hd
@@ -181,6 +181,10 @@ public:
     enableListenOnly: true
     autoShareWebcam: true
     skipVideoPreview: false
+    # Entry `thresholds` is an array of:
+    # - threshold: minimum number of cameras being shared for profile to applied
+    #   profile: a camera profile id from the cameraProfiles configuration array
+    #            that will be applied to all cameras when threshold is hit
     cameraQualityThresholds:
       enabled: false
       thresholds:
@@ -196,6 +200,21 @@ public:
           profile: low-u25
         - threshold: 30
           profile: low-u30
+    pagination:
+      # whether to globally enable or disable pagination.
+      enabled: false
+      # how long (in ms) the negotiation will be debounced after a page change.
+      pageChangeDebounceTime: 2500
+      # video page sizes for DESKTOP endpoints. It stands for the number of SUBSCRIBER streams.
+      # PUBLISHERS aren't accounted for .
+      # A page size of 0 (zero) means that the page size is unlimited (disabled).
+      desktopPageSizes:
+        moderator: 0
+        viewer: 5
+      # video page sizes for MOBILE endpoints
+      mobilePageSizes:
+        moderator: 2
+        viewer: 2
   pingPong:
     clearUsersInSeconds: 180
     pongTimeInSeconds: 15
@@ -432,22 +451,24 @@ private:
       enabled: false
   minBrowserVersions:
     - browser: chrome
-      version: 59
+      version: 72
     - browser: chromeMobileIOS
       version: Infinity
     - browser: firefox
-      version: 52
+      version: 63
     - browser: firefoxMobile
-      version: 52
+      version: 68
     - browser: edge
-      version: 17
+      version: 79
     - browser: ie
       version: Infinity
     - browser: safari
-      version: [11, 1]
+      version: [12, 1]
     - browser: mobileSafari
-      version: [11, 1]
+      version: [12, 1]
     - browser: opera
-      version: 46
+      version: 50
     - browser: electron
       version: [0, 36]
+    - browser: YandexBrowser
+      version: 19

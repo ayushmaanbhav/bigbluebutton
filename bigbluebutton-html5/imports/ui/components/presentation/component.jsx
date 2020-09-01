@@ -27,6 +27,18 @@ const intlMessages = defineMessages({
     id: 'app.presentation.notificationLabel',
     description: 'label displayed in toast when presentation switches',
   },
+  slideContentStart: {
+    id: 'app.presentation.startSlideContent',
+    description: 'Indicate the slide content start',
+  },
+  slideContentEnd: {
+    id: 'app.presentation.endSlideContent',
+    description: 'Indicate the slide content end',
+  },
+  noSlideContent: {
+    id: 'app.presentation.emptySlideContent',
+    description: 'No content available for slide',
+  },
 });
 
 const ALLOW_FULLSCREEN = Meteor.settings.public.app.allowFullscreen;
@@ -401,6 +413,7 @@ class PresentationArea extends PureComponent {
   // renders the whole presentation area
   renderPresentationArea(svgDimensions, viewBoxDimensions) {
     const {
+      intl,
       podId,
       currentSlide,
       slidePosition,
@@ -423,6 +436,7 @@ class PresentationArea extends PureComponent {
 
     const {
       imageUri,
+      content,
     } = currentSlide;
 
     let viewBoxPosition;
@@ -450,6 +464,10 @@ class PresentationArea extends PureComponent {
     const svgViewBox = `${viewBoxPosition.x} ${viewBoxPosition.y} `
       + `${viewBoxDimensions.width} ${Number.isNaN(viewBoxDimensions.height) ? 0 : viewBoxDimensions.height}`;
 
+    const slideContent = content ? `${intl.formatMessage(intlMessages.slideContentStart)}
+      ${content}
+      ${intl.formatMessage(intlMessages.slideContentEnd)}` : intl.formatMessage(intlMessages.noSlideContent);
+
     return (
       <div
         dir="rtl"
@@ -459,6 +477,7 @@ class PresentationArea extends PureComponent {
         }}
         className={styles.slidesContainer}
       >
+        <span id="currentSlideText" className={styles.visuallyHidden}>{slideContent}</span>
         {this.renderPresentationClose()}
         {this.renderPresentationDownload()}
         {this.renderPresentationFullscreen()}

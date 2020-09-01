@@ -8,9 +8,9 @@ import Button from '/imports/ui/components/button/component';
 import logger from '/imports/startup/client/logger';
 import Modal from '/imports/ui/components/modal/simple/component';
 import browser from 'browser-detect';
-import { Option, Select } from 'antd';
-import VideoService from '../video-provider/service';
+import { Select } from 'antd';
 import cx from 'classnames';
+import VideoService from '../video-provider/service';
 import { styles } from './styles';
 
 const CAMERA_PROFILES = Meteor.settings.public.kurento.cameraProfiles;
@@ -241,7 +241,10 @@ class VideoPreview extends Component {
     // skipped then we get devices with no labels
     if (hasMediaDevices) {
       try {
-        navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'user' } })
+        navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: 'user' },
+        })
           .then((stream) => {
             if (!this._isMounted) return;
             this.deviceStream = stream;
@@ -255,62 +258,65 @@ class VideoPreview extends Component {
               }
             }
 
-            navigator.mediaDevices.enumerateDevices().then((devices) => {
-              const webcams = [];
-              let initialDeviceId;
+            navigator.mediaDevices.enumerateDevices()
+              .then((devices) => {
+                const webcams = [];
+                let initialDeviceId;
 
-              VideoService.updateNumberOfDevices(devices);
+                VideoService.updateNumberOfDevices(devices);
 
-              if (!this._isMounted) return;
+                if (!this._isMounted) return;
 
-              // set webcam
-              devices.forEach((device) => {
-                // Avoid duplicated devices
-                const found = webcams.find(d => d.deviceId === device.deviceId);
-                if (device.kind === 'videoinput' && !found) {
-                  webcams.push(device);
-                  if (!initialDeviceId
-                  || (webcamDeviceId && webcamDeviceId === device.deviceId)
-                  || device.deviceId === firstAllowedDeviceId) {
-                    initialDeviceId = device.deviceId;
+                // set webcam
+                devices.forEach((device) => {
+                  // Avoid duplicated devices
+                  const found = webcams.find(d => d.deviceId === device.deviceId);
+                  if (device.kind === 'videoinput' && !found) {
+                    webcams.push(device);
+                    if (!initialDeviceId
+                      || (webcamDeviceId && webcamDeviceId === device.deviceId)
+                      || device.deviceId === firstAllowedDeviceId) {
+                      initialDeviceId = device.deviceId;
+                    }
                   }
+                });
+
+                logger.debug({
+                  logCode: 'video_preview_enumerate_devices',
+                  extraInfo: {
+                    devices,
+                    webcams,
+                  },
+                }, `Enumerate devices came back. There are ${devices.length} devices and ${webcams.length} are video inputs`);
+
+
+                if (initialDeviceId) {
+                  this.setState({
+                    availableWebcams: webcams,
+                  });
+                  this.displayInitialPreview(initialDeviceId);
                 }
-              });
-
-              logger.debug({
-                logCode: 'video_preview_enumerate_devices',
-                extraInfo: {
-                  devices,
-                  webcams,
-                },
-              }, `Enumerate devices came back. There are ${devices.length} devices and ${webcams.length} are video inputs`);
-
-
-              if (initialDeviceId) {
+                if (!skipVideoPreview) {
+                  this.setState({
+                    viewState: VIEW_STATES.found,
+                  });
+                }
+              })
+              .catch((error) => {
+                logger.warn({
+                  logCode: 'video_preview_enumerate_error',
+                  extraInfo: {
+                    errorName: error.name,
+                    errorMessage: error.message,
+                  },
+                }, 'Error enumerating devices');
                 this.setState({
-                  availableWebcams: webcams,
+                  viewState: VIEW_STATES.error,
+                  deviceError: VideoPreview.handleGUMError(error),
                 });
-                this.displayInitialPreview(initialDeviceId);
-              }
-              if (!skipVideoPreview) {
-                this.setState({
-                  viewState: VIEW_STATES.found,
-                });
-              }
-            }).catch((error) => {
-              logger.warn({
-                logCode: 'video_preview_enumerate_error',
-                extraInfo: {
-                  errorName: error.name,
-                  errorMessage: error.message,
-                },
-              }, 'Error enumerating devices');
-              this.setState({
-                viewState: VIEW_STATES.error,
-                deviceError: VideoPreview.handleGUMError(error),
               });
-            });
-          }).catch((error) => {
+          })
+          .catch((error) => {
             logger.warn({
               logCode: 'video_preview_initial_device_error',
               extraInfo: {
@@ -358,10 +364,11 @@ class VideoPreview extends Component {
     // console.log("in stop tracks");
     if (this.deviceStream) {
       // console.log("stopping tracks");
-      this.deviceStream.getTracks().forEach((track) => {
-        // console.log("found track to stop");
-        track.stop();
-      });
+      this.deviceStream.getTracks()
+        .forEach((track) => {
+          // console.log("found track to stop");
+          track.stop();
+        });
     }
   }
 
@@ -457,24 +464,26 @@ class VideoPreview extends Component {
     changeProfile(profile.id);
     if (skipVideoPreview) return this.handleStartSharing();
 
-    this.doGUM(deviceId, profile).then((stream) => {
-      if (!this._isMounted) return;
+    this.doGUM(deviceId, profile)
+      .then((stream) => {
+        if (!this._isMounted) return;
 
-      this.setState({
-        isStartSharingDisabled: false,
+        this.setState({
+          isStartSharingDisabled: false,
+        });
+        this.video.srcObject = stream;
+        this.deviceStream = stream;
+      })
+      .catch((error) => {
+        logger.warn({
+          logCode: 'video_preview_do_gum_preview_error',
+          extraInfo: {
+            errorName: error.name,
+            errorMessage: error.message,
+          },
+        }, 'Error displaying final selection.');
+        this.setState({ previewError: VideoPreview.handleGUMError(error) });
       });
-      this.video.srcObject = stream;
-      this.deviceStream = stream;
-    }).catch((error) => {
-      logger.warn({
-        logCode: 'video_preview_do_gum_preview_error',
-        extraInfo: {
-          errorName: error.name,
-          errorMessage: error.message,
-        },
-      }, 'Error displaying final selection.');
-      this.setState({ previewError: VideoPreview.handleGUMError(error) });
-    });
   }
 
   supportWarning() {
@@ -496,7 +505,7 @@ class VideoPreview extends Component {
     const {
       intl,
       skipVideoPreview,
-      sharedDevices
+      sharedDevices,
     } = this.props;
 
     const {
@@ -513,17 +522,21 @@ class VideoPreview extends Component {
         <label className={styles.label} htmlFor="setCam">
           {intl.formatMessage(intlMessages.cameraLabel)}
         </label>
-        { availableWebcams && availableWebcams.length > 0
+        {availableWebcams && availableWebcams.length > 0
           ? (
-              <Select
+            <Select
               id="setCam"
               value={webcamDeviceId || ''}
               onChange={this.handleSelectWebcam}
               disabled={skipVideoPreview}
-                options={availableWebcams.map(webcam => (
-                  { value: webcam.deviceId, key: webcam.deviceId, label: webcam.label }
+              options={availableWebcams.map(webcam => (
+                {
+                  value: webcam.deviceId,
+                  key: webcam.deviceId,
+                  label: webcam.label,
+                }
               ))}
-              />
+            />
           )
           : (
             <span>
@@ -531,47 +544,46 @@ class VideoPreview extends Component {
             </span>
           )
         }
-        { shared
-           ? (
-             <span className={styles.label}>
-               {intl.formatMessage(intlMessages.sharedCameraLabel)}
-             </span>
-           )
-           : (
-             <span>
-               <label className={styles.label} htmlFor="setQuality">
-                 {intl.formatMessage(intlMessages.qualityLabel)}
-               </label>
-               { availableProfiles && availableProfiles.length > 0
-                 ? (
-              <Select
-                     id="setQuality"
-                     value={selectedProfile || ''}
-                     onChange={this.handleSelectProfile}
-                     disabled={skipVideoPreview}
-                   >
-                     {availableProfiles.map(profile => {
-                      const label = intlMessages[`${profile.id}`]
-                        ? intl.formatMessage(intlMessages[`${profile.id}`])
-                        : profile.name;
+        {shared
+          ? (
+            <span className={styles.label}>
+              {intl.formatMessage(intlMessages.sharedCameraLabel)}
+            </span>
+          )
+          : (
+            <span>
+              <label className={styles.label} htmlFor="setQuality">
+                {intl.formatMessage(intlMessages.qualityLabel)}
+              </label>
+              {availableProfiles && availableProfiles.length > 0
+                ? (
+                  <Select
+                    id="setQuality"
+                    value={selectedProfile || ''}
+                    onChange={this.handleSelectProfile}
+                    disabled={skipVideoPreview}
 
-                      return (
-                       <option key={profile.id} value={profile.id}>
-                          {`${label} ${profile.id === 'hd' ? '' : intl.formatMessage(intlMessages.qualityLabel).toLowerCase()}`}
-                       </option>
-                     )})}
-                   </select>
-                options={availableProfiles.map(profile => (
-                  { value: profile.id, key: profile.id, label: profile.name }
-                     ))}
-              />
-                 )
-                 : (
-                   <span>
-                     {intl.formatMessage(intlMessages.profileNotFoundLabel)}
-                   </span>
-                 )
-               }
+                    options={
+                      availableProfiles
+                        .map(profile => (
+                          {
+                            value: profile.id,
+                            key: profile.id,
+                            label: `${intlMessages[`${profile.id}`]
+                              ? intl.formatMessage(intlMessages[`${profile.id}`])
+                              : profile.name} ${profile.id === 'hd' ? '' : intl.formatMessage(intlMessages.qualityLabel)
+                              .toLowerCase()}`,
+                          }
+                        ))
+                    }
+                  />
+                )
+                : (
+                  <span>
+                    {intl.formatMessage(intlMessages.profileNotFoundLabel)}
+                  </span>
+                )
+              }
             </span>
           )
         }
@@ -605,7 +617,9 @@ class VideoPreview extends Component {
       case VIEW_STATES.error:
         return (
           <div className={styles.content}>
-            <div className={styles.videoCol}><div>{deviceError}</div></div>
+            <div className={styles.videoCol}>
+              <div>{deviceError}</div>
+            </div>
           </div>
         );
       case VIEW_STATES.found:
@@ -614,24 +628,26 @@ class VideoPreview extends Component {
           <div className={styles.content}>
             <div className={styles.videoCol}>
               {
-              previewError
-                ? (
-                  <div>{previewError}</div>
-                )
-                : (
-                  <video
-                    id="preview"
-                    className={cx({
-                      [styles.preview]: true,
-                      [styles.mirroredVideo]: this.mirrorOwnWebcam,
-                    })}
-                    ref={(ref) => { this.video = ref; }}
-                    autoPlay
-                    playsInline
-                    muted
-                  />
-                )
-            }
+                previewError
+                  ? (
+                    <div>{previewError}</div>
+                  )
+                  : (
+                    <video
+                      id="preview"
+                      className={cx({
+                        [styles.preview]: true,
+                        [styles.mirroredVideo]: this.mirrorOwnWebcam,
+                      })}
+                      ref={(ref) => {
+                        this.video = ref;
+                      }}
+                      autoPlay
+                      playsInline
+                      muted
+                    />
+                  )
+              }
             </div>
             {this.renderDeviceSelectors()}
           </div>
@@ -678,15 +694,17 @@ class VideoPreview extends Component {
         {this.renderContent()}
 
         <div className={styles.footer}>
-          {hasVideoStream ?
-            (<div className={styles.extraActions}>
-              <Button
-                color="danger"
-                label={intl.formatMessage(intlMessages.stopSharingAllLabel)}
-                onClick={this.handleStopSharingAll}
-                disabled={shouldDisableButtons}
-              />
-            </div>)
+          {hasVideoStream
+            ? (
+              <div className={styles.extraActions}>
+                <Button
+                  color="danger"
+                  label={intl.formatMessage(intlMessages.stopSharingAllLabel)}
+                  onClick={this.handleStopSharingAll}
+                  disabled={shouldDisableButtons}
+                />
+              </div>
+            )
             : null
           }
           <div className={styles.actions}>
@@ -696,7 +714,7 @@ class VideoPreview extends Component {
               disabled={shouldDisableButtons}
             />
             <Button
-              color={shared ? "danger" : "primary"}
+              color={shared ? 'danger' : 'primary'}
               label={intl.formatMessage(shared ? intlMessages.stopSharingLabel : intlMessages.startSharingLabel)}
               onClick={shared ? this.handleStopSharing : this.handleStartSharing}
               disabled={isStartSharingDisabled || isStartSharingDisabled === null || shouldDisableButtons}

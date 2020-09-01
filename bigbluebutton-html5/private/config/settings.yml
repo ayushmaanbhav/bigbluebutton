@@ -6,13 +6,13 @@ public:
     autoJoin: true
     listenOnlyMode: false
     forceListenOnly: false
-    skipCheck: true
+    skipCheck: false
     clientTitle: Enlite
     appName: Enlite Client
     bbbServerVersion: 2.2
     copyright: "©2020 Enlite"
-    html5ClientBuild: 1.1
-    helpLink: https://enlite.in
+    html5ClientBuild: 960
+    helpLink: https://enlite.in/help
     lockOnJoin: true
     cdn: ""
     basename: "/html5client"
@@ -27,8 +27,8 @@ public:
     ipv4FallbackDomain: ""
     allowLogout: true
     allowFullscreen: true
-    remainingTimeThreshold: 30
-    remainingTimeAlertThreshold: 1
+    remainingTimeThreshold: 10
+    remainingTimeAlertThreshold: 5
     defaultSettings:
       application:
         animations: true
@@ -160,15 +160,15 @@ public:
         constraints:
           frameRate: 10
       - id: low
-        name: Low
+        name: Low quality
         default: false
         bitrate: 100
       - id: medium
-        name: Medium
+        name: Medium quality
         default: true
         bitrate: 200
       - id: high
-        name: High
+        name: High quality
         default: false
         bitrate: 500
       - id: hd
@@ -177,6 +177,7 @@ public:
         bitrate: 800
     enableScreensharing: true
     enableVideo: true
+    enableVideoStats: false
     enableVideoMenu: true
     enableListenOnly: true
     autoShareWebcam: true
@@ -269,7 +270,7 @@ public:
   media:
     stunTurnServersFetchAddress: "/bigbluebutton/api/stuns"
     cacheStunTurnServers: true
-    fallbackStunServer:  ''
+    fallbackStunServer: ''
     mediaTag: "#remote-media"
     callTransferTimeout: 5000
     callHangupTimeout: 2000
@@ -285,42 +286,42 @@ public:
     uploadSizeMin: 0
     uploadSizeMax: 50000000
     uploadValidMimeTypes:
-    - extension: .pdf
-      mime: application/pdf
-    - extension: .doc
-      mime: application/msword
-    - extension: .docx
-      mime: application/vnd.openxmlformats-officedocument.wordprocessingml.document
-    - extension: .xls
-      mime: application/vnd.ms-excel
-    - extension: .xlsx
-      mime: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-    - extension: .ppt
-      mime: application/vnd.ms-powerpoint
-    - extension: .pptx
-      mime: application/vnd.openxmlformats-officedocument.presentationml.presentation
-    - extension: .txt
-      mime: text/plain
-    - extension: .rtf
-      mime: application/rtf
-    - extension: .odt
-      mime: application/vnd.oasis.opendocument.text
-    - extension: .ods
-      mime: application/vnd.oasis.opendocument.spreadsheet
-    - extension: .odp
-      mime: application/vnd.oasis.opendocument.presentation
-    - extension: .odg
-      mime: application/vnd.oasis.opendocument.graphics
-    - extension: .odc
-      mime: application/vnd.oasis.opendocument.chart
-    - extension: .odi
-      mime: application/vnd.oasis.opendocument.image
-    - extension: .jpg
-      mime: image/jpeg
-    - extension: .jpeg
-      mime: image/jpeg
-    - extension: .png
-      mime: image/png
+      - extension: .pdf
+        mime: application/pdf
+      - extension: .doc
+        mime: application/msword
+      - extension: .docx
+        mime: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      - extension: .xls
+        mime: application/vnd.ms-excel
+      - extension: .xlsx
+        mime: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+      - extension: .ppt
+        mime: application/vnd.ms-powerpoint
+      - extension: .pptx
+        mime: application/vnd.openxmlformats-officedocument.presentationml.presentation
+      - extension: .txt
+        mime: text/plain
+      - extension: .rtf
+        mime: application/rtf
+      - extension: .odt
+        mime: application/vnd.oasis.opendocument.text
+      - extension: .ods
+        mime: application/vnd.oasis.opendocument.spreadsheet
+      - extension: .odp
+        mime: application/vnd.oasis.opendocument.presentation
+      - extension: .odg
+        mime: application/vnd.oasis.opendocument.graphics
+      - extension: .odc
+        mime: application/vnd.oasis.opendocument.chart
+      - extension: .odi
+        mime: application/vnd.oasis.opendocument.image
+      - extension: .jpg
+        mime: image/jpeg
+      - extension: .jpeg
+        mime: image/jpeg
+      - extension: .png
+        mime: image/png
   user:
     role_moderator: MODERATOR
     role_viewer: VIEWER
@@ -358,56 +359,57 @@ public:
       - label: silver
         value: "#c0c0c0"
       thickness:
-      - value: 14
-      - value: 12
-      - value: 10
-      - value: 8
-      - value: 6
-      - value: 4
-      - value: 2
-      - value: 1
+        - value: 14
+        - value: 12
+        - value: 10
+        - value: 8
+        - value: 6
+        - value: 4
+        - value: 2
+        - value: 1
       font_sizes:
-      - value: 36
-      - value: 32
-      - value: 28
-      - value: 24
-      - value: 20
-      - value: 16
+        - value: 36
+        - value: 32
+        - value: 28
+        - value: 24
+        - value: 20
+        - value: 16
       tools:
-      - icon: text_tool
-        value: text
-      - icon: line_tool
-        value: line
-      - icon: circle_tool
-        value: ellipse
-      - icon: triangle_tool
-        value: triangle
-      - icon: rectangle_tool
-        value: rectangle
-      - icon: pen_tool
-        value: pencil
-      - icon: hand
-        value: hand
+        - icon: text_tool
+          value: text
+        - icon: line_tool
+          value: line
+        - icon: circle_tool
+          value: ellipse
+        - icon: triangle_tool
+          value: triangle
+        - icon: rectangle_tool
+          value: rectangle
+        - icon: pen_tool
+          value: pencil
+        - icon: hand
+          value: hand
       presenterTools:
-      - text
-      - line
-      - ellipse
-      - triangle
-      - rectangle
-      - pencil
-      - hand
+        - text
+        - line
+        - ellipse
+        - triangle
+        - rectangle
+        - pencil
+        - hand
       multiUserTools:
-      - text
-      - line
-      - ellipse
-      - triangle
-      - rectangle
-      - pencil
-      - hand
+        - text
+        - line
+        - ellipse
+        - triangle
+        - rectangle
+        - pencil
+        - hand
   clientLog:
-    server: { enabled: true, level: info }
-    console: { enabled: false, level: debug }
-    external: { enabled: false, level: info, url: https://LOG_HOST/html5Log, method: POST, throttleInterval: 400, flushOnClose: true, logTag: "" }
+    server: {enabled: false, level: info}
+    console: {enabled: false, level: debug}
+    external: {enabled: false, level: info, url: 'https://LOG_HOST/html5Log', method: POST,
+               throttleInterval: 400, flushOnClose: true, logTag: ""}
 private:
   app:
     host: 127.0.0.1
@@ -430,15 +432,15 @@ private:
       toAkkaApps: to-akka-apps-redis-channel
       toThirdParty: to-third-party-redis-channel
     subscribeTo:
-    - to-html5-redis-channel
-    - from-akka-apps-*
-    - from-third-party-redis-channel
-    - from-etherpad-redis-channel
+      - to-html5-redis-channel
+      - from-akka-apps-*
+      - from-third-party-redis-channel
+      - from-etherpad-redis-channel
     async:
-    - from-akka-apps-wb-redis-channel
+      - from-akka-apps-wb-redis-channel
     ignored:
-    - CheckAlivePongSysMsg
-    - DoLatencyTracerMsg
+      - CheckAlivePongSysMsg
+      - DoLatencyTracerMsg
   serverLog:
     level: info
     streamerLog: false
@@ -451,24 +453,22 @@ private:
       enabled: false
   minBrowserVersions:
     - browser: chrome
-      version: 72
+      version: 59
     - browser: chromeMobileIOS
       version: Infinity
     - browser: firefox
-      version: 63
+      version: 52
     - browser: firefoxMobile
-      version: 68
+      version: 52
     - browser: edge
-      version: 79
+      version: 17
     - browser: ie
       version: Infinity
     - browser: safari
-      version: [12, 1]
+      version: [11, 1]
     - browser: mobileSafari
-      version: [12, 1]
+      version: [11, 1]
     - browser: opera
-      version: 50
+      version: 46
     - browser: electron
       version: [0, 36]
-    - browser: YandexBrowser
-      version: 19

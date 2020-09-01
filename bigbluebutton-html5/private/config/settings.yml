@@ -12,7 +12,7 @@ public:
     bbbServerVersion: 2.2
     copyright: "©2020 Enlite"
     html5ClientBuild: HTML5_CLIENT_VERSION
-    helpLink: https://bigbluebutton.org/html5/
+    helpLink: https://enlite.in
     lockOnJoin: true
     cdn: ""
     basename: "/html5client"
@@ -86,7 +86,7 @@ public:
     enableNetworkMonitoring: false
     packetLostThreshold: 10
   kurento:
-    wsUrl: ws://localhost/bbb-webrtc-sfu
+    wsUrl: wss://localhost.enlite.in/bbb-webrtc-sfu
     # Valid for video-provider. Time (ms) before its WS connection times out
     # and tries to reconnect.
     wsConnectionTimeout: 4000

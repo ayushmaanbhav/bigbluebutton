@@ -137,8 +137,6 @@ class ActionsBar extends PureComponent {
           {enableVideo && amIModerator
             ? (
               <JoinVideoOptionsContainer
-                handleJoinVideo={handleJoinVideo}
-                handleCloseVideo={handleExitVideo}
                 className={styles.hiddenControls}
               />
             )

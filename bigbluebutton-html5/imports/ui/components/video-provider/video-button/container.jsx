@@ -5,6 +5,7 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import VideoPreviewContainer from '/imports/ui/components/video-preview/container';
 import JoinVideoButton from './component';
 import VideoService from '../service';
+import { validIOSVersion } from '../../app/service';
 
 const JoinVideoOptionsContainer = (props) => {
   const {
@@ -15,11 +16,17 @@ const JoinVideoOptionsContainer = (props) => {
     ...restProps
   } = props;
 
-  const mountVideoPreview = () => { mountModal(<VideoPreviewContainer fromInterface />); };
+  const mountVideoPreview = () => {
+    mountModal(<VideoPreviewContainer fromInterface />);
+  };
 
   return (
     <JoinVideoButton {...{
-      mountVideoPreview, hasVideoStream, isDisabled, ...restProps,
+      mountVideoPreview,
+      hasVideoStream,
+      isDisabled,
+      validIOSVersion,
+      ...restProps,
     }}
     />
   );

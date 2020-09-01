@@ -2,10 +2,9 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Button from '/imports/ui/components/button/component';
-import VideoService from '../service';
 import { defineMessages, injectIntl, intlShape } from 'react-intl';
+import VideoService from '../service';
 import { styles } from './styles';
-import { validIOSVersion } from '/imports/ui/components/app/service';
 
 const intlMessages = defineMessages({
   joinVideo: {
@@ -41,9 +40,6 @@ const JoinVideoButton = ({
   intl,
   hasVideoStream,
   isDisabled,
-  handleJoinVideo,
-  handleCloseVideo,
-  notify,
   validIOSVersion,
   className,
   mountVideoPreview,
@@ -52,7 +48,8 @@ const JoinVideoButton = ({
 
   const handleOnClick = () => {
     if (!validIOSVersion()) {
-      return VideoService.notify(intl.formatMessage(intlMessages.iOSWarning));
+      VideoService.notify(intl.formatMessage(intlMessages.iOSWarning));
+      return;
     }
 
     if (exitVideo()) {
@@ -62,9 +59,9 @@ const JoinVideoButton = ({
     }
   };
 
-  const label = exitVideo() ?
-    intl.formatMessage(intlMessages.leaveVideo) :
-    intl.formatMessage(intlMessages.joinVideo);
+  const label = exitVideo()
+    ? intl.formatMessage(intlMessages.leaveVideo)
+    : intl.formatMessage(intlMessages.joinVideo);
 
   return (
     <Button
@@ -73,9 +70,9 @@ const JoinVideoButton = ({
       onClick={handleOnClick}
       hideLabel
       aria-label={intl.formatMessage(intlMessages.videoButtonDesc)}
-      color={isSharingVideo ? 'danger' : 'primary'}
-      icon={isSharingVideo ? 'video' : 'video_off'}
-      ghost={!isSharingVideo}
+      color={hasVideoStream ? 'danger' : 'primary'}
+      icon={hasVideoStream ? 'video' : 'video_off'}
+      ghost={!hasVideoStream}
       size="lg"
       circle
       disabled={isDisabled || !navigator.mediaDevices}

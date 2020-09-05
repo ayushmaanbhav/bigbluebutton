@@ -33,7 +33,9 @@ const mapActiveChats = (chat) => {
 
   const { chatId } = chat;
 
-  const userId = GroupChat.findOne({ chatId }).users.filter(user => user !== currentUserId);
+  const userId = GroupChat.findOne({ chatId })
+    .users
+    .filter(user => user !== currentUserId);
 
   return userId[0];
 };
@@ -52,11 +54,14 @@ const sortUsersByName = (a, b) => {
 
   if (aName < bName) {
     return -1;
-  } if (aName > bName) {
+  }
+  if (aName > bName) {
     return 1;
-  } if (a.userId > b.userId) {
+  }
+  if (a.userId > b.userId) {
     return -1;
-  } if (a.userId < b.userId) {
+  }
+  if (a.userId < b.userId) {
     return 1;
   }
 
@@ -67,12 +72,15 @@ const sortUsersByEmoji = (a, b) => {
   if (a.emoji && b.emoji && (a.emoji !== 'none' && b.emoji !== 'none')) {
     if (a.emojiTime < b.emojiTime) {
       return -1;
-    } if (a.emojiTime > b.emojiTime) {
+    }
+    if (a.emojiTime > b.emojiTime) {
       return 1;
     }
-  } if (a.emoji && a.emoji !== 'none') {
+  }
+  if (a.emoji && a.emoji !== 'none') {
     return -1;
-  } if (b.emoji && b.emoji !== 'none') {
+  }
+  if (b.emoji && b.emoji !== 'none') {
     return 1;
   }
   return 0;
@@ -81,9 +89,11 @@ const sortUsersByEmoji = (a, b) => {
 const sortUsersByModerator = (a, b) => {
   if (a.role === ROLE_MODERATOR && b.role === ROLE_MODERATOR) {
     return 0;
-  } if (a.role === ROLE_MODERATOR) {
+  }
+  if (a.role === ROLE_MODERATOR) {
     return -1;
-  } if (b.role === ROLE_MODERATOR) {
+  }
+  if (b.role === ROLE_MODERATOR) {
     return 1;
   }
 
@@ -93,9 +103,11 @@ const sortUsersByModerator = (a, b) => {
 const sortUsersByPhoneUser = (a, b) => {
   if (!a.clientType === DIAL_IN_CLIENT_TYPE && !b.clientType === DIAL_IN_CLIENT_TYPE) {
     return 0;
-  } if (!a.clientType === DIAL_IN_CLIENT_TYPE) {
+  }
+  if (!a.clientType === DIAL_IN_CLIENT_TYPE) {
     return -1;
-  } if (!b.clientType === DIAL_IN_CLIENT_TYPE) {
+  }
+  if (!b.clientType === DIAL_IN_CLIENT_TYPE) {
     return 1;
   }
 
@@ -106,7 +118,8 @@ const sortUsersByPhoneUser = (a, b) => {
 const sortUsersByCurrent = (a, b) => {
   if (a.userId === Auth.userID) {
     return -1;
-  } if (b.userId === Auth.userID) {
+  }
+  if (b.userId === Auth.userID) {
     return 1;
   }
 
@@ -138,11 +151,14 @@ const sortUsers = (a, b) => {
 const sortChatsByName = (a, b) => {
   if (a.name.toLowerCase() < b.name.toLowerCase()) {
     return -1;
-  } if (a.name.toLowerCase() > b.name.toLowerCase()) {
+  }
+  if (a.name.toLowerCase() > b.name.toLowerCase()) {
     return 1;
-  } if (a.userId.toLowerCase() > b.userId.toLowerCase()) {
+  }
+  if (a.userId.toLowerCase() > b.userId.toLowerCase()) {
     return -1;
-  } if (a.userId.toLowerCase() < b.userId.toLowerCase()) {
+  }
+  if (a.userId.toLowerCase() < b.userId.toLowerCase()) {
     return 1;
   }
 
@@ -152,9 +168,11 @@ const sortChatsByName = (a, b) => {
 const sortChatsByIcon = (a, b) => {
   if (a.icon && b.icon) {
     return sortChatsByName(a, b);
-  } if (a.icon) {
+  }
+  if (a.icon) {
     return -1;
-  } if (b.icon) {
+  }
+  if (b.icon) {
     return 1;
   }
 
@@ -191,7 +209,12 @@ const getUsers = () => {
     }, userFindSorting)
     .fetch();
 
-  const currentUser = Users.findOne({ userId: Auth.userID }, { fields: { role: 1, locked: 1 } });
+  const currentUser = Users.findOne({ userId: Auth.userID }, {
+    fields: {
+      role: 1,
+      locked: 1,
+    },
+  });
   if (currentUser && currentUser.role === ROLE_VIEWER && currentUser.locked) {
     const meeting = Meetings.findOne({ meetingId: Auth.meetingID },
       { fields: { 'lockSettingsProps.hideUserList': 1 } });
@@ -205,7 +228,8 @@ const getUsers = () => {
 };
 
 const hasBreakoutRoom = () => Breakouts.find({ parentMeetingId: Auth.meetingID },
-  { fields: {} }).count() > 0;
+  { fields: {} })
+  .count() > 0;
 
 const isMe = userId => userId === Auth.userID;
 
@@ -276,7 +300,8 @@ const getActiveChats = (chatID) => {
     .sort(sortChats);
 };
 
-const isVoiceOnlyUser = userId => userId.toString().startsWith('v_');
+const isVoiceOnlyUser = userId => userId.toString()
+  .startsWith('v_');
 
 const isMeetingLocked = (id) => {
   const meeting = Meetings.findOne({ meetingId: id }, { fields: { lockSettingsProps: 1 } });
@@ -383,14 +408,17 @@ const normalizeEmojiName = emoji => (
 );
 
 const setEmojiStatus = (userId, emoji) => {
-  const statusAvailable = (Object.keys(EMOJI_STATUSES).includes(emoji));
+  const statusAvailable = (Object.keys(EMOJI_STATUSES)
+    .includes(emoji));
 
   return statusAvailable
     ? makeCall('setEmojiStatus', Auth.userID, emoji)
     : makeCall('setEmojiStatus', userId, 'none');
 };
 
-const assignPresenter = (userId) => { makeCall('assignPresenter', userId); };
+const assignPresenter = (userId) => {
+  makeCall('assignPresenter', userId);
+};
 
 const removeUser = (userId, banUser) => {
   if (isVoiceOnlyUser(userId)) {
@@ -407,16 +435,25 @@ const toggleVoice = (userId) => {
     makeCall('toggleVoice', userId);
     logger.info({
       logCode: 'usermenu_option_mute_toggle_audio',
-      extraInfo: { logType: 'moderator_action', userId },
+      extraInfo: {
+        logType: 'moderator_action',
+        userId,
+      },
     }, 'moderator muted user microphone');
   }
 };
 
-const muteAllUsers = (userId) => { makeCall('muteAllUsers', userId); };
+const muteAllUsers = (userId) => {
+  makeCall('muteAllUsers', userId);
+};
 
-const muteAllExceptPresenter = (userId) => { makeCall('muteAllExceptPresenter', userId); };
+const muteAllExceptPresenter = (userId) => {
+  makeCall('muteAllExceptPresenter', userId);
+};
 
-const changeRole = (userId, role) => { makeCall('changeRole', userId, role); };
+const changeRole = (userId, role) => {
+  makeCall('changeRole', userId, role);
+};
 
 const roving = (event, changeState, elementsList, element) => {
   this.selectedElement = element;
@@ -497,6 +534,7 @@ const sortUsersByFirstName = (a, b) => {
 const sortUsersByLastName = (a, b) => {
   if (a.lastName && !b.lastName) return -1;
   if (!a.lastName && b.lastName) return 1;
+  if (!a.lastName && !b.lastName) return 1;
 
   const aName = a.lastName.toLowerCase();
   const bName = b.lastName.toLowerCase();
@@ -515,19 +553,24 @@ export const getUserNamesLink = (docTitle, fnSortedLabel, lnSortedLabel) => {
         firstName: name[0],
         middleNames: name.length > 2 ? name.slice(1, name.length - 1) : null,
         lastName: name.length > 1 ? name[name.length - 1] : null,
+        userID: u.extId,
       });
     });
 
   const getUsernameString = (user) => {
-    const { firstName, middleNames, lastName } = user;
-    return `${firstName || ''} ${middleNames && middleNames.length > 0 ? middleNames.join(' ') : ''} ${lastName || ''}`;
+    const {
+      firstName, middleNames, lastName, userID,
+    } = user;
+    return `${firstName || ''} ${middleNames && middleNames.length > 0 ? middleNames.join(' ') : ''} ${lastName || ''}: ${userID}`;
   };
 
   const namesByFirstName = userNamesObj.sort(sortUsersByFirstName)
-    .map(u => getUsernameString(u)).join('\r\n');
+    .map(u => getUsernameString(u))
+    .join('\r\n');
 
   const namesByLastName = userNamesObj.sort(sortUsersByLastName)
-    .map(u => getUsernameString(u)).join('\r\n');
+    .map(u => getUsernameString(u))
+    .join('\r\n');
 
   const namesListsString = `${docTitle}\r\n\r\n${fnSortedLabel}\r\n${namesByFirstName}
     \r\n\r\n${lnSortedLabel}\r\n${namesByLastName}`.replace(/ {2}/g, ' ');

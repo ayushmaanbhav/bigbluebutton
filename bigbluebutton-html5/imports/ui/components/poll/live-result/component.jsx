@@ -23,6 +23,14 @@ const intlMessages = defineMessages({
     id: 'app.poll.backLabel',
     description: 'label for the return to poll options button',
   },
+  downloadLabel: {
+    id: 'app.poll.downloadLabel',
+    description: 'label for downloading results of Quiz',
+  },
+  cancelLabel: {
+    id: 'app.captions.menu.cancelLabel',
+    description: 'Cancel button label',
+  },
   doneLabel: {
     id: 'app.createBreakoutRoom.doneLabel',
     description: 'label shown when all users have responded',
@@ -43,22 +51,21 @@ const getResponseString = (obj) => {
 };
 
 class LiveResult extends PureComponent {
-  static getDerivedStateFromProps(nextProps) {
-    const {
-      currentPoll, intl, pollAnswerIds,
-    } = nextProps;
+  constructor(props) {
+    super(props);
 
-    if (!currentPoll) return null;
+    this.state = {
+      userAnswers: null,
+      pollStats: null,
+    };
+  }
 
-    const {
-      answers, responses, users, numRespondents,
-    } = currentPoll;
-
-    let userAnswers = responses
+  static getUserAnswers(responses, users, answers) {
+    const userAnswers = responses
       ? [...users, ...responses.map(u => u.userId)]
       : [...users];
 
-    userAnswers = userAnswers.map(id => Service.getUser(id))
+    return userAnswers.map(id => Service.getUser(id))
       .filter(user => user.connectionStatus === 'online')
       .map((user) => {
         let answer = '';
@@ -70,10 +77,25 @@ class LiveResult extends PureComponent {
 
         return {
           name: user.name,
+          userId: user.extId,
           answer,
         };
       })
-      .sort(Service.sortUsers)
+      .sort(Service.sortUsers);
+  }
+
+  static getDerivedStateFromProps(nextProps) {
+    const {
+      currentPoll, intl, pollAnswerIds,
+    } = nextProps;
+
+    if (!currentPoll) return null;
+
+    const {
+      answers, responses, users, numRespondents,
+    } = currentPoll;
+
+    const userAnswers = LiveResult.getUserAnswers(responses, users, answers)
       .reduce((acc, user) => {
         const formattedMessageIndex = user.answer.toLowerCase();
         return ([
@@ -130,14 +152,6 @@ class LiveResult extends PureComponent {
     };
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      userAnswers: null,
-      pollStats: null,
-    };
-  }
 
   render() {
     const {
@@ -171,6 +185,36 @@ class LiveResult extends PureComponent {
       question = currentPoll.question ? currentPoll.question : '';
     }
 
+    function downloadResults() {
+      if (!currentPoll) {
+        return;
+      }
+      const {
+        answers, responses, users,
+      } = currentPoll;
+      let csv = `Question:, ${question}\nAnswers:,${answers.map(x => x.key)
+        .join(',')}\nStudent, Student ID, Response\n`;
+      const allResponses = LiveResult.getUserAnswers(responses, users, answers);
+      allResponses.forEach((response) => {
+        csv += `${[response.name, response.userId, response.answer].join(',')}\n`;
+      });
+      const blob = new Blob([csv], {
+        type: 'text/csv;charset=utf-8;',
+      });
+      const date = new Date();
+      const filename = `${`${date.toLocaleDateString('en-US', { day: 'numeric' })}-${date.toLocaleDateString('en-US', { month: 'short' })}-${date.toLocaleDateString('en-US', { year: 'numeric' })}`}.csv`;
+      if (window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+      } else {
+        const elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+      }
+    }
+
     return (
       <div>
         <div className={styles.stats}>
@@ -195,7 +239,7 @@ class LiveResult extends PureComponent {
             ? <span className={styles.connectingAnimation} /> : null}
         </div>
         {currentPoll
-          ? (
+          ? (<>
             <Button
               disabled={!isMeteorConnected}
               onClick={() => {
@@ -206,6 +250,26 @@ class LiveResult extends PureComponent {
               color={waiting ? 'primary' : 'success'}
               className={styles.btn}
             />
+            <Button
+              disabled={!isMeteorConnected}
+              onClick={() => {
+                downloadResults();
+              }}
+              label={intl.formatMessage(intlMessages.downloadLabel)}
+              color={waiting ? 'primary' : 'success'}
+              className={styles.btn}
+            />
+            <Button
+              disabled={!isMeteorConnected}
+              onClick={() => {
+                stopPoll();
+                handleBackClick();
+              }}
+              label={intl.formatMessage(intlMessages.cancelLabel)}
+              color="danger"
+              className={styles.btn}
+            />
+            </>
           ) : (
             <Button
               disabled={!isMeteorConnected}

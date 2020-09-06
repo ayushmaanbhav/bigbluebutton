@@ -28,8 +28,12 @@ const intlMessages = defineMessages({
     description: 'label for downloading results of Quiz',
   },
   cancelLabel: {
-    id: 'app.captions.menu.cancelLabel',
+    id: 'app.poll.cancelLabel',
     description: 'Cancel button label',
+  },
+  finishLabel: {
+    id: 'app.poll.finishLabel',
+    description: 'Finish button label',
   },
   doneLabel: {
     id: 'app.createBreakoutRoom.doneLabel',
@@ -240,35 +244,40 @@ class LiveResult extends PureComponent {
         </div>
         {currentPoll
           ? (<>
-            <Button
-              disabled={!isMeteorConnected}
-              onClick={() => {
-                Service.publishPoll();
-                stopPoll();
-              }}
-              label={intl.formatMessage(intlMessages.publishLabel)}
-              color={waiting ? 'primary' : 'success'}
-              className={styles.btn}
-            />
-            <Button
-              disabled={!isMeteorConnected}
-              onClick={() => {
-                downloadResults();
-              }}
-              label={intl.formatMessage(intlMessages.downloadLabel)}
-              color={waiting ? 'primary' : 'success'}
-              className={styles.btn}
-            />
-            <Button
-              disabled={!isMeteorConnected}
-              onClick={() => {
-                stopPoll();
-                handleBackClick();
-              }}
-              label={intl.formatMessage(intlMessages.cancelLabel)}
-              color="danger"
-              className={styles.btn}
-            />
+            <div className={styles.alignCenter}>
+              <Button
+                disabled={!isMeteorConnected}
+                onClick={() => {
+                  Service.publishPoll();
+                  stopPoll();
+                }}
+                label={intl.formatMessage(intlMessages.publishLabel)}
+                color={waiting ? 'primary' : 'success'}
+                className={styles.btn}
+              />
+              <Button
+                disabled={!isMeteorConnected}
+                onClick={() => {
+                  downloadResults();
+                }}
+                icon="download"
+                label={intl.formatMessage(intlMessages.downloadLabel)}
+                color={waiting ? 'primary' : 'success'}
+                className={styles.btn}
+              />
+            </div>
+            <div className={styles.alignCenter}>
+              <Button
+                disabled={!isMeteorConnected}
+                onClick={() => {
+                  stopPoll();
+                  handleBackClick();
+                }}
+                label={waiting ? intl.formatMessage(intlMessages.cancelLabel) : intl.formatMessage(intlMessages.finishLabel)}
+                color="danger"
+                className={styles.btn}
+              />
+            </div>
             </>
           ) : (
             <Button

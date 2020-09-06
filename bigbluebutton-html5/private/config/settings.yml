@@ -4,9 +4,9 @@ public:
     desktopFontSize: 14px
     audioChatNotification: false
     autoJoin: true
-    listenOnlyMode: false
-    forceListenOnly: false
-    skipCheck: false
+    listenOnlyMode: true
+    forceListenOnly: true
+    skipCheck: true
     clientTitle: Enlite
     appName: Enlite Client
     bbbServerVersion: 2.2

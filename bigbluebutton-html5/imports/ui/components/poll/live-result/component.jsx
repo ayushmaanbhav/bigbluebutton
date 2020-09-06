@@ -164,6 +164,7 @@ class LiveResult extends PureComponent {
       stopPoll,
       handleBackClick,
       currentPoll,
+      meetingName,
     } = this.props;
 
     const { userAnswers, pollStats } = this.state;
@@ -205,8 +206,13 @@ class LiveResult extends PureComponent {
       const blob = new Blob([csv], {
         type: 'text/csv;charset=utf-8;',
       });
-      const date = new Date();
-      const filename = `${`${date.toLocaleDateString('en-US', { day: 'numeric' })}-${date.toLocaleDateString('en-US', { month: 'short' })}-${date.toLocaleDateString('en-US', { year: 'numeric' })}`}.csv`;
+      const filename = `${meetingName}-${(new Date()).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+      })}.csv`;
       if (window.navigator.msSaveOrOpenBlob) {
         window.navigator.msSaveBlob(blob, filename);
       } else {
@@ -323,4 +329,5 @@ LiveResult.propTypes = {
   ]),
   stopPoll: PropTypes.func.isRequired,
   handleBackClick: PropTypes.func.isRequired,
+  meetingName: PropTypes.string.isRequired,
 };

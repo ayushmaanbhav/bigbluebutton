@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, injectIntl } from 'react-intl';
-import PresentationUploaderContainer from '/imports/ui/components/presentation/presentation-uploader/container';
+import PresentationUploaderContainer
+  from '/imports/ui/components/presentation/presentation-uploader/container';
 import { withModalMounter } from '/imports/ui/components/modal/service';
 import _ from 'lodash';
 import { Session } from 'meteor/session';
@@ -142,7 +143,8 @@ class Poll extends Component {
   handleInputChange(index, event) {
     // This regex will replace any instance of 2 or more consecutive white spaces
     // with a single white space character.
-    const option = event.target.value.replace(/\s{2,}/g, ' ').trim();
+    const option = event.target.value.replace(/\s{2,}/g, ' ')
+      .trim();
 
     this.inputEditor[index] = option === '' ? '' : option;
 
@@ -150,7 +152,8 @@ class Poll extends Component {
   }
 
   handleQuestionChange(event) {
-    const customQuestion = event.target.value.replace(/\s{2,}/g, ' ').trim();
+    const customQuestion = event.target.value.replace(/\s{2,}/g, ' ')
+      .trim();
     this.customQuestion = customQuestion === '' ? '' : customQuestion;
     this.setState({ customQuestion: this.customQuestion });
   }
@@ -185,7 +188,8 @@ class Poll extends Component {
 
       const label = intl.formatMessage(
         // regex removes the - to match the message id
-        intlMessages[type.replace(/-/g, '').toLowerCase()],
+        intlMessages[type.replace(/-/g, '')
+          .toLowerCase()],
       );
 
       return (
@@ -268,22 +272,26 @@ class Poll extends Component {
       </div>
     );
 
-    items = items.concat(_.range(1, numOfQuizOptions + 1).map((ele, index) => {
-      const id = index;
-      return (
-        <div key={`custom-poll-${id}`} className={styles.pollInput}>
-          <Input
-            placeholder={intl.formatMessage(intlMessages.customPlaceholder)}
-            aria-label={intl.formatMessage(
-              intlMessages.ariaInputCount, { 0: id + 1, 1: numOfQuizOptions },
-            )}
-            onChange={event => this.handleInputChange(id, event)}
-            defaultValue={customPollValues[id]}
-            maxLength={MAX_INPUT_CHARS}
-          />
-        </div>
-      );
-    }));
+    items = items.concat(_.range(1, numOfQuizOptions + 1)
+      .map((ele, index) => {
+        const id = index;
+        return (
+          <div key={`custom-poll-${id}`} className={styles.pollInput}>
+            <Input
+              placeholder={intl.formatMessage(intlMessages.customPlaceholder)}
+              aria-label={intl.formatMessage(
+                intlMessages.ariaInputCount, {
+                  0: id + 1,
+                  1: numOfQuizOptions,
+                },
+              )}
+              onChange={event => this.handleInputChange(id, event)}
+              defaultValue={customPollValues[id]}
+              maxLength={MAX_INPUT_CHARS}
+            />
+          </div>
+        );
+      }));
 
     return items;
   }
@@ -295,6 +303,7 @@ class Poll extends Component {
       stopPoll,
       currentPoll,
       pollAnswerIds,
+      meetingName,
     } = this.props;
 
     return (
@@ -308,6 +317,7 @@ class Poll extends Component {
             stopPoll,
             currentPoll,
             pollAnswerIds,
+            meetingName,
           }}
           handleBackClick={this.handleBackClick}
         />
@@ -388,7 +398,9 @@ class Poll extends Component {
       <div>
         <header className={styles.header}>
           <Button
-            ref={(node) => { this.hideBtn = node; }}
+            ref={(node) => {
+              this.hideBtn = node;
+            }}
             tabIndex={0}
             label={intl.formatMessage(intlMessages.pollPaneTitle)}
             icon="left_arrow"
@@ -435,4 +447,5 @@ Poll.propTypes = {
   startPoll: PropTypes.func.isRequired,
   startCustomPoll: PropTypes.func.isRequired,
   stopPoll: PropTypes.func.isRequired,
+  meetingName: PropTypes.string.isRequired,
 };

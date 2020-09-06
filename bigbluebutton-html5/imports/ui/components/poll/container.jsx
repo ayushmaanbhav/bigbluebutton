@@ -6,6 +6,7 @@ import Presentations from '/imports/api/presentations';
 import PresentationAreaService from '/imports/ui/components/presentation/service';
 import Poll from '/imports/ui/components/poll/component';
 import Service from './service';
+import ActionsBarService from '../actions-bar/service';
 
 const PollContainer = ({ ...props }) => <Poll {...props} />;
 
@@ -30,6 +31,7 @@ export default withTracker(() => {
     startCustomPoll,
     stopPoll: Service.stopPoll,
     publishPoll: Service.publishPoll,
+    meetingName: ActionsBarService.meetingName(),
     currentPoll: Service.currentPoll(),
     resetPollPanel: Session.get('resetPollPanel') || false,
     pollAnswerIds: Service.pollAnswerIds,

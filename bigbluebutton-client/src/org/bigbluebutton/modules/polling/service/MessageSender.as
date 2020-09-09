@@ -27,10 +27,10 @@ package org.bigbluebutton.modules.polling.service
   public class MessageSender {
     private static const LOGGER:ILogger = getClassLogger(MessageSender);
 
-    public function startCustomPoll(pollId:String, pollType: String, answers:Array, question:String):void {
+    public function startCustomPoll(pollId:String, pollType: String, poll:Array):void {
       var message:Object = {
         header: {name: "StartCustomPollReqMsg", meetingId: UsersUtil.getInternalMeetingID(), userId: UsersUtil.getMyUserID()},
-        body: {requesterId: UsersUtil.getMyUserID(), pollId: pollId, pollType: pollType, answers: answers, question: question}
+        body: {requesterId: UsersUtil.getMyUserID(), pollId: pollId, pollType: pollType, poll: poll}
       };
 
       var _nc:ConnectionManager = BBB.initConnectionManager();
@@ -79,8 +79,7 @@ package org.bigbluebutton.modules.polling.service
       );
     }
     
-    public function votePoll(pollId:String, answerId:Number):void {
-      var questionId: int = 0; // assume only one question per poll
+    public function votePoll(pollId:String, questionId: Number, answerId:Number):void {
 
       var message:Object = {
         header: {name: "RespondToPollReqMsg", meetingId: UsersUtil.getInternalMeetingID(), userId: UsersUtil.getMyUserID()},

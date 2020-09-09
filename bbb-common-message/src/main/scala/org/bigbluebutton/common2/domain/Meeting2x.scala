@@ -70,6 +70,7 @@ case class Meeting2x(defaultProps: DefaultProps, meetingStatus: MeetingStatus)
 
 case class SimpleAnswerOutVO(id: Int, key: String)
 case class SimplePollOutVO(id: String, answers: Array[SimpleAnswerOutVO], question: Option[String])
+case class CustomPollVO(id: String, answers: Array[String], question: Option[String])
 case class SimpleVoteOutVO(id: Int, key: String, numVotes: Int)
 case class SimplePollResultOutVO(id: String, answers: Array[SimpleVoteOutVO], question: Option[String], numRespondents: Int, numResponders: Int)
 case class Responder(userId: String, name: String)

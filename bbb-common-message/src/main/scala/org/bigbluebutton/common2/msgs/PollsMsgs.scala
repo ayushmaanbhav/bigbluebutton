@@ -1,6 +1,6 @@
 package org.bigbluebutton.common2.msgs
 
-import org.bigbluebutton.common2.domain.{ PollVO, SimplePollOutVO, SimplePollResultOutVO }
+import org.bigbluebutton.common2.domain.{ PollVO, SimplePollOutVO, SimplePollResultOutVO, CustomPollVO }
 
 object GetCurrentPollReqMsg { val NAME = "GetCurrentPollReqMsg" }
 case class GetCurrentPollReqMsg(header: BbbClientMsgHeader, body: GetCurrentPollReqMsgBody) extends StandardMsg
@@ -44,7 +44,7 @@ case class ShowPollResultReqMsgBody(requesterId: String, pollId: String)
 
 object StartCustomPollReqMsg { val NAME = "StartCustomPollReqMsg" }
 case class StartCustomPollReqMsg(header: BbbClientMsgHeader, body: StartCustomPollReqMsgBody) extends StandardMsg
-case class StartCustomPollReqMsgBody(requesterId: String, pollId: String, pollType: String, answers: Seq[String], question: String)
+case class StartCustomPollReqMsgBody(requesterId: String, pollId: String, pollType: String, poll: Array[CustomPollVO])
 
 object StartPollReqMsg { val NAME = "StartPollReqMsg" }
 case class StartPollReqMsg(header: BbbClientMsgHeader, body: StartPollReqMsgBody) extends StandardMsg

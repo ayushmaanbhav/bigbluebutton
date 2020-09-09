@@ -75,7 +75,7 @@ package org.bigbluebutton.modules.polling.service
     public function handleStartCustomPollEvent(event:StartCustomPollEvent):void {
       var pollId:String = generatePollId();
       if (pollId == null) return;
-      dataService.startCustomPoll(pollId, event.pollType, event.answers);
+      dataService.startCustomPoll(pollId, event.pollType, event.poll);
     }
 
     public function handleStartPollEvent(event:StartPollEvent):void {

@@ -101,10 +101,32 @@ class Poll extends Component {
     super(props);
 
     this.state = {
-      customPollReq: false,
       isPolling: false,
       customPollValues: [],
       customQuestion: '',
+      customPoll: [
+        {
+          id: '0',
+          question: 'Q1',
+          answers: [
+            'A',
+            'B',
+            'C',
+            'D',
+          ],
+        },
+        {
+          id: '1',
+          question: 'Q2',
+          answers: [
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+          ],
+        },
+      ],
       numOfQuizOptions: MAX_CUSTOM_FIELDS,
     };
 
@@ -115,6 +137,7 @@ class Poll extends Component {
     this.renderQuickPollBtns = this.renderQuickPollBtns.bind(this);
     this.renderCustomView = this.renderCustomView.bind(this);
     this.renderInputFields = this.renderInputFields.bind(this);
+    this.renderCustomQuestionsView = this.renderCustomQuestionsView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleBackClick = this.handleBackClick.bind(this);
   }
@@ -211,36 +234,43 @@ class Poll extends Component {
 
   renderCustomView() {
     const { intl, startCustomPoll } = this.props;
-    const { numOfQuizOptions } = this.state;
-    const isDisabled = _.compact(this.inputEditor).length < 1;
-
+    const { customPoll } = this.state;
+    const isDisabled = customPoll.length < 1;
+    Session.set('pollInitiated', true);
+    this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
     return (
       <div className={styles.customInputWrapper}>
         {this.renderInputFields()}
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          margin: '1rem 0',
-        }}
-        >
-          <AntButton
-            type="dashed"
-            onClick={() => {
-              this.setState({ numOfQuizOptions: numOfQuizOptions + 1 });
-            }}
-            style={{ width: '80%' }}
-          >
-            <PlusOutlined />
-            {'Add answer'}
-          </AntButton>
-        </div>
-
         <Button
           onClick={() => {
             if (this.inputEditor.length > 0) {
+              // Session.set('pollInitiated', true);
+              this.setState(prevState => ({
+                customPoll:
+                  [...prevState.customPoll, {
+                    id: prevState.customPoll.length.toString(),
+                    question: this.customQuestion,
+                    answers: _.compact(this.inputEditor),
+                  }],
+              }));
+              this.setState({
+                numOfQuizOptions: MAX_CUSTOM_FIELDS,
+                customPollValues: [],
+                customQuestion: '',
+              });
+            }
+          }}
+          label="Add Quiz"
+          color="primary"
+          aria-disabled={isDisabled}
+          disabled={isDisabled}
+          className={styles.btn}
+        />
+        <Button
+          onClick={() => {
+            if (customPoll.length > 0) {
               Session.set('pollInitiated', true);
-              this.setState({ isPolling: true }, () => startCustomPoll('custom', _.compact(this.inputEditor), this.customQuestion));
+              this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
             }
           }}
           label={intl.formatMessage(intlMessages.startCustomLabel)}
@@ -251,6 +281,29 @@ class Poll extends Component {
         />
       </div>
     );
+  }
+
+  renderCustomQuestionsView() {
+    // const { intl } = this.props;
+    const { customPoll } = this.state;
+    const items = [];
+    customPoll.forEach((poll, pollIndex) => {
+      items.push(
+        // eslint-disable-next-line react/no-array-index-key
+        <div key={`custom-poll-view${pollIndex}`} className={styles.pollQuestion}>
+          <h3>{poll.question}</h3>
+          <ul>
+            {
+              poll.answers.map((ans, index) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <li key={`ans${pollIndex}${index}`}>{ans}</li>
+              ))
+            }
+          </ul>
+        </div>,
+      );
+    });
+    return items;
   }
 
   renderInputFields() {
@@ -292,7 +345,26 @@ class Poll extends Component {
           </div>
         );
       }));
-
+    items = items.concat(
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '1rem 0',
+      }}
+      >
+        <AntButton
+          type="dashed"
+          onClick={() => {
+            this.setState({ numOfQuizOptions: numOfQuizOptions + 1 });
+          }}
+          style={{ width: '80%' }}
+        >
+          <PlusOutlined />
+          {'Add answer'}
+        </AntButton>
+      </div>,
+    );
     return items;
   }
 
@@ -326,8 +398,7 @@ class Poll extends Component {
   }
 
   renderPollOptions() {
-    const { isMeteorConnected, intl } = this.props;
-    const { customPollReq } = this.state;
+    const { intl } = this.props;
 
     return (
       <div>
@@ -340,15 +411,8 @@ class Poll extends Component {
         <div className={styles.instructions}>
           {intl.formatMessage(intlMessages.customPollInstruction)}
         </div>
-        <Button
-          disabled={!isMeteorConnected}
-          className={styles.customBtn}
-          color="default"
-          onClick={this.toggleCustomFields}
-          label={intl.formatMessage(intlMessages.customPollLabel)}
-          aria-expanded={customPollReq}
-        />
-        {!customPollReq ? null : this.renderCustomView()}
+        {this.renderCustomQuestionsView()}
+        {this.renderCustomView()}
       </div>
     );
   }
@@ -411,21 +475,21 @@ class Poll extends Component {
             }}
           />
 
-          <Button
-            label={intl.formatMessage(intlMessages.closeLabel)}
-            aria-label={`${intl.formatMessage(intlMessages.closeLabel)} ${intl.formatMessage(intlMessages.pollPaneTitle)}`}
-            onClick={() => {
-              if (currentPoll) {
-                stopPoll();
-              }
-              Session.set('openPanel', 'userlist');
-              Session.set('forcePollOpen', false);
-            }}
-            className={styles.closeBtn}
-            icon="close"
-            size="sm"
-            hideLabel
-          />
+          {/* <Button */}
+          {/*  label={intl.formatMessage(intlMessages.closeLabel)} */}
+          {/*  aria-label={`${intl.formatMessage(intlMessages.closeLabel)} ${intl.formatMessage(intlMessages.pollPaneTitle)}`} */}
+          {/*  onClick={() => { */}
+          {/*    if (currentPoll) { */}
+          {/*      stopPoll(); */}
+          {/*    } */}
+          {/*    Session.set('openPanel', 'userlist'); */}
+          {/*    Session.set('forcePollOpen', false); */}
+          {/*  }} */}
+          {/*  className={styles.closeBtn} */}
+          {/*  icon="close" */}
+          {/*  size="sm" */}
+          {/*  hideLabel */}
+          {/* /> */}
 
         </header>
         {

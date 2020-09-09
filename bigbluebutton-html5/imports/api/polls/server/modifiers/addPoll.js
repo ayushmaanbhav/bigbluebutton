@@ -5,9 +5,10 @@ import flat from 'flat';
 import { check } from 'meteor/check';
 
 export default function addPoll(meetingId, requesterId, poll) {
+  console.log('$$$$', requesterId, poll);
   check(requesterId, String);
   check(meetingId, String);
-  check(poll, {
+  check(poll, [{
     id: String,
     question: Match.OneOf(String, null, undefined),
     answers: [
@@ -16,7 +17,7 @@ export default function addPoll(meetingId, requesterId, poll) {
         key: String,
       },
     ],
-  });
+  }]);
 
   const userSelector = {
     meetingId,

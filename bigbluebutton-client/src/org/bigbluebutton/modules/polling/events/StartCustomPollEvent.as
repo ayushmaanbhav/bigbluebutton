@@ -25,13 +25,13 @@ package org.bigbluebutton.modules.polling.events
     public static const START:String = "start custom poll";
 
     public var pollType: String;
-    public var answers: Array;
+    public var poll: Array;
 
-    public function StartCustomPollEvent(pollType: String, answers: Array)
+    public function StartCustomPollEvent(pollType: String, poll: Array)
     {
       super(START, true, false);
       this.pollType = pollType;
-      this.answers = answers;
+      this.poll = poll;
     }
 
   }

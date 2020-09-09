@@ -2,7 +2,7 @@ import RedisPubSub from '/imports/startup/server/redis';
 import { check } from 'meteor/check';
 import { extractCredentials } from '/imports/api/common/server/helpers';
 
-export default function startPoll(pollType, pollId, answers, question) {
+export default function startPoll(pollType, pollId, poll) {
   const REDIS_CONFIG = Meteor.settings.private.redis;
   const CHANNEL = REDIS_CONFIG.channels.toAkkaApps;
 
@@ -21,12 +21,13 @@ export default function startPoll(pollType, pollId, answers, question) {
 
   if (pollType === 'custom') {
     EVENT_NAME = 'StartCustomPollReqMsg';
-    check(answers, Array);
-    payload.answers = answers;
-    if (question) {
-      check(question, String);
-      payload.question = question;
-    }
+    check(poll, [{
+      id: String,
+      question: Match.OneOf(String, null, undefined),
+      answers: [String],
+    }]);
+    payload.poll = poll;
+    payload.timeLimit = 5; // mins
   }
 
   return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);

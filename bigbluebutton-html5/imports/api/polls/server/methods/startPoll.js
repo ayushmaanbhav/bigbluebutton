@@ -12,23 +12,27 @@ export default function startPoll(pollType, pollId, poll) {
 
   check(pollId, String);
   check(pollType, String);
+  const pollID = `${pollId}/${new Date().getTime()}`;
 
   const payload = {
     requesterId: requesterUserId,
-    pollId: `${pollId}/${new Date().getTime()}`,
+    pollId: pollID,
     pollType,
   };
 
   if (pollType === 'custom') {
     EVENT_NAME = 'StartCustomPollReqMsg';
-    check(poll, [{
+    check(poll, {
       id: String,
-      question: Match.OneOf(String, null, undefined),
-      answers: [String],
-    }]);
+      questions: [{
+        question: Match.OneOf(String, null, undefined),
+        answers:
+          [String],
+        multiResponse: Boolean,
+      }],
+    });
     payload.poll = poll;
-    payload.timeLimit = 5; // mins
+    // payload.timeLimit = 5; // mins
   }
-
   return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
 }

@@ -106,7 +106,6 @@ class Poll extends Component {
       customQuestion: '',
       customPoll: [
         {
-          id: '0',
           question: 'Q1',
           answers: [
             'A',
@@ -114,9 +113,9 @@ class Poll extends Component {
             'C',
             'D',
           ],
+          multiResponse: false,
         },
         {
-          id: '1',
           question: 'Q2',
           answers: [
             '1',
@@ -125,6 +124,7 @@ class Poll extends Component {
             '4',
             '5',
           ],
+          multiResponse: false,
         },
       ],
       numOfQuizOptions: MAX_CUSTOM_FIELDS,
@@ -248,7 +248,6 @@ class Poll extends Component {
               this.setState(prevState => ({
                 customPoll:
                   [...prevState.customPoll, {
-                    id: prevState.customPoll.length.toString(),
                     question: this.customQuestion,
                     answers: _.compact(this.inputEditor),
                   }],

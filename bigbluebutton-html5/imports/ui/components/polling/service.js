@@ -9,6 +9,8 @@ const mapPolls = () => {
     return { pollExists: false };
   }
 
+  console.log('mapPolls', poll);
+
   const { answers } = poll;
   let stackOptions = false;
 

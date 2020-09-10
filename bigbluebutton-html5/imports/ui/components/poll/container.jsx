@@ -20,7 +20,10 @@ export default withTracker(() => {
 
   const startPoll = type => makeCall('startPoll', type, currentSlide.id);
 
-  const startCustomPoll = (type, poll) => makeCall('startPoll', type, currentSlide.id, poll);
+  const startCustomPoll = (type, poll) => makeCall('startPoll', type, currentSlide.id, {
+    id: currentSlide.id,
+    questions: poll,
+  });
 
   return {
     currentSlide,

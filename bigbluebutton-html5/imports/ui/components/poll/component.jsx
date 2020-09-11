@@ -236,8 +236,8 @@ class Poll extends Component {
     const { intl, startCustomPoll } = this.props;
     const { customPoll } = this.state;
     const isDisabled = customPoll.length < 1;
-    Session.set('pollInitiated', true);
-    this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
+    // Session.set('pollInitiated', true);
+    // this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
     return (
       <div className={styles.customInputWrapper}>
         {this.renderInputFields()}
@@ -250,6 +250,7 @@ class Poll extends Component {
                   [...prevState.customPoll, {
                     question: this.customQuestion,
                     answers: _.compact(this.inputEditor),
+                    multiResponse: false,
                   }],
               }));
               this.setState({
@@ -382,16 +383,21 @@ class Poll extends Component {
         <div className={styles.instructions}>
           {intl.formatMessage(intlMessages.activePollInstruction)}
         </div>
-        <LiveResult
-          {...{
-            isMeteorConnected,
-            stopPoll,
-            currentPoll,
-            pollAnswerIds,
-            meetingName,
-          }}
-          handleBackClick={this.handleBackClick}
-        />
+        {
+          currentPoll && currentPoll.questions.map(cp => (
+            <LiveResult
+              key={cp.id}
+              {...{
+                isMeteorConnected,
+                stopPoll,
+                cp,
+                pollAnswerIds,
+                meetingName,
+              }}
+              handleBackClick={this.handleBackClick}
+            />
+          ))
+        }
       </div>
     );
   }

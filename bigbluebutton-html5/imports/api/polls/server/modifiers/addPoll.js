@@ -11,6 +11,7 @@ export default function addPoll(meetingId, requesterId, poll) {
   check(poll, {
     id: String,
     questions: [{
+      id: String,
       question: Match.OneOf(String, null, undefined),
       answers: [
         {

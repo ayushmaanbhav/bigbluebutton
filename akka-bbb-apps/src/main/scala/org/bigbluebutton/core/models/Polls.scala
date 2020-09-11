@@ -454,13 +454,21 @@ object PollFactory {
 
   def createCustomPoll(id: String, pollType: String, numRespondents: Int, polls: CustomPoll): Option[Poll] = {
     var poll: Option[Poll] = None
-    var questions: Array[Question] = Array()
     var pollQuestions = polls.questions
+    var questions = new Array[Question](pollQuestions.length)
+
     Array.tabulate(pollQuestions.length) {
       i => {
-        questions :+ createQuestion(pollType, pollQuestions(i).answers, pollQuestions(i).question, i)
+        println("Amar createCustomPoll " + pollType + pollQuestions(i).answers + pollQuestions(i).question)
+        createQuestion(pollType, pollQuestions(i).answers, pollQuestions(i).question, i) match {
+          case Some(question) => {
+            questions(i) = question
+          }
+          case None => None
+        }
       }
     }
+    println("Amar questions " + questions(0) + " LEN: " + questions.length)
     poll = Some(new Poll(id, questions, numRespondents, None))
     poll
   }
@@ -545,13 +553,13 @@ class Poll(val id: String, val questions: Array[Question], val numRespondents: I
   }
 
   def toSimplePollOutVO(): SimplePollOutVO = {
-    new SimplePollOutVO(id, questions(0).toSimpleAnswerOutVO(), questions(0).text)
+    new SimplePollOutVO("0", questions(0).toSimpleAnswerOutVO(), questions(0).text)
   }
 
   def toCustomPollOutVO(): CustomPollOutVO = {
-    val customPoll = questions.map(q => {
-      new SimplePollOutVO(id, q.toSimpleAnswerOutVO(), q.text)
-    })
+    val customPoll = questions.zipWithIndex.map { case (q, index) => {
+      new SimplePollOutVO(index.toString, q.toSimpleAnswerOutVO(), q.text)
+    }}
     new CustomPollOutVO(id, customPoll)
   }
 

@@ -27,10 +27,10 @@ const PollingContainer = ({ pollExists, ...props }) => {
 PollingContainer.propTypes = propTypes;
 
 export default withTracker(() => {
-  const { pollExists, handleVote, poll } = PollingService.mapPolls();
+  const { pollExists, submitAnswers, poll } = PollingService.mapPolls();
   return ({
     pollExists,
-    handleVote,
+    submitAnswers,
     poll,
     pollAnswerIds: PollService.pollAnswerIds,
     isMeteorConnected: Meteor.status().connected,

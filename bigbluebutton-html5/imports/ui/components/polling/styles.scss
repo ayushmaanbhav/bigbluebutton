@@ -73,6 +73,7 @@
 .pollingButton {
   width: 100%;
   max-width: var(--max-btn-width);
+  border: 1px solid var(--color-primary);
 
   @include mq($hasPhoneDimentions) {
     max-width: none;

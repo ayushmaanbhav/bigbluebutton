@@ -124,7 +124,7 @@ class Poll extends Component {
             '4',
             '5',
           ],
-          multiResponse: false,
+          multiResponse: true,
         },
       ],
       numOfQuizOptions: MAX_CUSTOM_FIELDS,
@@ -378,13 +378,16 @@ class Poll extends Component {
       meetingName,
     } = this.props;
 
+    if (!currentPoll) {
+      return null;
+    }
     return (
       <div>
         <div className={styles.instructions}>
           {intl.formatMessage(intlMessages.activePollInstruction)}
         </div>
         {
-          currentPoll && currentPoll.questions.map(cp => (
+          currentPoll && currentPoll.questions ? currentPoll.questions.map(cp => (
             <LiveResult
               key={cp.id}
               {...{
@@ -396,7 +399,19 @@ class Poll extends Component {
               }}
               handleBackClick={this.handleBackClick}
             />
-          ))
+          )) : (
+            <LiveResult
+              key={currentPoll.id}
+              {...{
+                isMeteorConnected,
+                stopPoll,
+                currentPoll,
+                pollAnswerIds,
+                meetingName,
+              }}
+              handleBackClick={this.handleBackClick}
+            />
+          )
         }
       </div>
     );

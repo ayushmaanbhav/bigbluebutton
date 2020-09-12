@@ -34,5 +34,6 @@ export default function startPoll(pollType, pollId, poll) {
     payload.poll = poll;
     // payload.timeLimit = 5; // mins
   }
+  console.log('Payload: ', payload.poll);
   return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
 }

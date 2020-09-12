@@ -8,9 +8,23 @@ export default function addPoll(meetingId, requesterId, poll) {
   console.log('$$$$', requesterId, poll);
   check(requesterId, String);
   check(meetingId, String);
-  check(poll, {
-    id: String,
-    questions: [{
+  if (poll.questions) {
+    check(poll, {
+      id: String,
+      questions: [{
+        id: String,
+        question: Match.OneOf(String, null, undefined),
+        answers: [
+          {
+            id: Number,
+            key: String,
+          },
+        ],
+        multiResponse: Boolean,
+      }],
+    });
+  } else {
+    check(poll, {
       id: String,
       question: Match.OneOf(String, null, undefined),
       answers: [
@@ -19,8 +33,10 @@ export default function addPoll(meetingId, requesterId, poll) {
           key: String,
         },
       ],
-    }],
-  });
+      multiResponse: Boolean,
+    });
+  }
+
 
   const userSelector = {
     meetingId,

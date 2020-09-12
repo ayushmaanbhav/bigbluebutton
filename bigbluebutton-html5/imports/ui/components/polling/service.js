@@ -23,17 +23,28 @@ const mapPolls = () => {
   // });
 
   const amIRequester = poll.requester !== 'userId';
-
-  return {
-    poll: {
+  let currentPoll = {};
+  if (poll.questions) {
+    currentPoll = {
       questions: poll.questions,
       pollId: poll.id,
       stackOptions,
-    },
+    };
+  } else {
+    currentPoll = {
+      answers: poll.answers,
+      question: poll.question,
+      pollId: poll.id,
+      stackOptions,
+    };
+  }
+
+  return {
+    poll: currentPoll,
     pollExists: true,
     amIRequester,
-    handleVote(pollId, answerId) {
-      makeCall('publishVote', pollId, answerId.id);
+    submitAnswers(pollId, answersMap) {
+      makeCall('publishVote', pollId, answersMap['0'][0]);
     },
   };
 };

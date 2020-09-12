@@ -21,7 +21,16 @@ const intlMessages = defineMessages({
 class Polling extends Component {
   constructor(props) {
     super(props);
-
+    const { poll } = this.props;
+    const answers = {};
+    if (poll.questions) {
+      poll.questions.forEach((question) => {
+        answers[question.id] = [];
+      });
+    } else {
+      answers[poll.pollId] = [];
+    }
+    this.state = { pollAnswers: answers };
     this.play = this.play.bind(this);
   }
 
@@ -34,22 +43,65 @@ class Polling extends Component {
     this.alert.play();
   }
 
+  handleVote(question, pollAnswer) {
+    this.setState(({ pollAnswers }) => {
+      if (question.multiResponse) {
+        if (!pollAnswers[question.id].includes(pollAnswer.id)) {
+          pollAnswers[question.id].push(pollAnswer.id);
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          pollAnswers[question.id] = pollAnswers[question.id].filter(pa => pa !== pollAnswer.id);
+        }
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        pollAnswers[question.id] = [pollAnswer.id];
+      }
+      return pollAnswers;
+    });
+    const { pollAnswers } = this.state;
+    console.log({
+      pollAnswers,
+      question,
+      pollAnswer,
+    });
+  }
+
   render() {
     const {
       isMeteorConnected,
       intl,
       poll,
-      handleVote,
+      submitAnswers,
       pollAnswerIds,
     } = this.props;
+
+    const { pollAnswers } = this.state;
 
     if (!poll) {
       return null;
     }
-    const { stackOptions, questions } = poll;
+    const { stackOptions, questions, pollId } = poll;
+    let allQuestions = [];
+    if (questions) {
+      allQuestions = questions;
+    } else {
+      allQuestions = [{
+        id: pollId,
+        answers: poll.answers,
+        question: poll.question,
+        multiResponse: poll.multiResponse,
+      }];
+    }
+
+    console.log({
+      allQuestions,
+      poll,
+      pollAnswers,
+    });
+
     const pollAnswerStyles = {
       [styles.pollingAnswers]: true,
-      [styles.removeColumns]: questions.length === 1,
+      // [styles.removeColumns]: questions.length === 1,
       [styles.stacked]: stackOptions,
     };
 
@@ -64,7 +116,7 @@ class Polling extends Component {
           role="alert"
         >
           {
-            questions.map(question => (<>
+            allQuestions.map(question => (<>
               <div className={styles.pollingTitle}>
                 {question.question || intl.formatMessage(intlMessages.pollingTitleLabel)}
               </div>
@@ -84,11 +136,11 @@ class Polling extends Component {
                       <Button
                         disabled={!isMeteorConnected}
                         className={styles.pollingButton}
-                        color="primary"
+                        color={pollAnswers[question.id].includes(pollAnswer.id) ? 'primary' : 'default'}
                         size="md"
                         label={label}
                         key={pollAnswer.key}
-                        onClick={() => handleVote(poll.pollId, pollAnswer)}
+                        onClick={() => this.handleVote(question, pollAnswer)}
                         aria-labelledby={`pollAnswerLabel${pollAnswer.key}`}
                         aria-describedby={`pollAnswerDesc${pollAnswer.key}`}
                       />
@@ -109,6 +161,16 @@ class Polling extends Component {
                 })}
               </div>
             </>))}
+          <Button
+            disabled={!isMeteorConnected}
+            className={styles.pollingButton}
+            color="primary"
+            size="md"
+            label="Submit"
+            onClick={() => submitAnswers(pollId, pollAnswers)}
+            aria-labelledby="submit answers"
+            aria-describedby="submit answers"
+          />
         </div>
       </div>);
   }
@@ -120,7 +182,7 @@ Polling.propTypes = {
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
   }).isRequired,
-  handleVote: PropTypes.func.isRequired,
+  submitAnswers: PropTypes.func.isRequired,
   poll: PropTypes.shape({
     pollId: PropTypes.string.isRequired,
     question: PropTypes.string,

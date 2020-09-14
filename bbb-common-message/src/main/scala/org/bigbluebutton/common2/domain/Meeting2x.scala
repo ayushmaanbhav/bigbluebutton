@@ -69,7 +69,7 @@ case class MeetingStatus(startEndTimeStatus: StartEndTimeStatus, recordingStatus
 case class Meeting2x(defaultProps: DefaultProps, meetingStatus: MeetingStatus)
 
 case class SimpleAnswerOutVO(id: Int, key: String)
-case class SimplePollOutVO(id: String, answers: Array[SimpleAnswerOutVO], question: Option[String])
+case class SimplePollOutVO(id: String, answers: Array[SimpleAnswerOutVO], question: Option[String], multiResponse: Boolean)
 case class CustomQuestion(question: Option[String], answers: Option[Seq[String]], multiResponse: Boolean)
 case class CustomPoll(id: String, questions: Array[CustomQuestion])
 case class CustomPollOutVO(id: String, questions: Array[SimplePollOutVO])

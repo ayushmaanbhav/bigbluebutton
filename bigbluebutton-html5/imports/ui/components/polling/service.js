@@ -10,7 +10,7 @@ const mapPolls = () => {
     return { pollExists: false };
   }
 
-  console.log('mapPolls', poll);
+  // console.log('mapPolls', poll);
 
   const stackOptions = false;
   //
@@ -44,7 +44,10 @@ const mapPolls = () => {
     pollExists: true,
     amIRequester,
     submitAnswers(pollId, answersMap) {
-      makeCall('publishVote', pollId, answersMap['0'][0]);
+      // console.log({ answersMap });
+      Object.keys(answersMap).forEach((key) => {
+        makeCall('publishVote', pollId, answersMap[key][0]);
+      });
     },
   };
 };

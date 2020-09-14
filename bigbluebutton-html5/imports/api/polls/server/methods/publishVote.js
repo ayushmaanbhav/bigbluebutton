@@ -56,5 +56,9 @@ export default function publishVote(id, pollAnswerId) { // TODO discuss location
 
   Polls.update(selector, modifier, cb);
 
+  // console.log({
+  //   payload, id, pollAnswerId, currentPoll,
+  // });
+
   return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
 }

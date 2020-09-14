@@ -5,7 +5,7 @@ import flat from 'flat';
 import { check } from 'meteor/check';
 
 export default function addPoll(meetingId, requesterId, poll) {
-  console.log('$$$$', requesterId, poll);
+  // console.log('$$$$', requesterId, poll);
   check(requesterId, String);
   check(meetingId, String);
   if (poll.questions) {

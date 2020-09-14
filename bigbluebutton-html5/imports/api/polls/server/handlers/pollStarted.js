@@ -10,7 +10,9 @@ export default function pollStarted({ body }, meetingId) {
   check(userId, String);
   check(poll, Object);
 
-  console.log({ poll, body });
+  if (!poll.questions) {
+    poll.id = body.pollId;
+  }
   setPublishedPoll(meetingId, false);
 
   return addPoll(meetingId, userId, poll);

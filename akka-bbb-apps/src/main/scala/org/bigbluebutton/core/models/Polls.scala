@@ -30,10 +30,10 @@ object Polls {
       stampedPollId: String = pageId + "/" + System.currentTimeMillis()
       numRespondents: Int = Users2x.numUsers(lm.users2x) - 1 // subtract the presenter
 
-      poll <- createPoll(stampedPollId, numRespondents)
+      poll <- createPoll(pollId, numRespondents)
       simplePoll <- getSimplePoll(poll.id, lm.polls)
     } yield {
-      startPoll(simplePoll.id, lm.polls)
+      startPoll(poll.id, lm.polls)
       simplePoll
     }
   }
@@ -419,7 +419,7 @@ object PollFactory {
     questionOption
   }
 
-  private def createQuestion(qType: String, answers: Option[Seq[String]], questionText: Option[String], qid: Int): Option[Question] = {
+  private def createQuestion(qType: String, answers: Option[Seq[String]], questionText: Option[String], qid: Int, multiResponse: Boolean = false): Option[Question] = {
 
     val qt = qType.toUpperCase()
     var questionOption: Option[Question] = None
@@ -429,7 +429,7 @@ object PollFactory {
     } else if (qt.matches(PollType.TrueFalsePollType)) {
       questionOption = Some(processTrueFalsePollType(qt))
     } else if (qt.matches(PollType.CustomPollType)) {
-      questionOption = processCustomPollType(qt, false, answers, questionText, qid)
+      questionOption = processCustomPollType(qt, multiResponse, answers, questionText, qid)
     } else if (qt.startsWith(PollType.LetterPollType)) {
       questionOption = processLetterPollType(qt, false)
     } else if (qt.startsWith(PollType.NumberPollType)) {
@@ -459,8 +459,7 @@ object PollFactory {
 
     Array.tabulate(pollQuestions.length) {
       i => {
-        println("Amar createCustomPoll " + pollType + pollQuestions(i).answers + pollQuestions(i).question)
-        createQuestion(pollType, pollQuestions(i).answers, pollQuestions(i).question, i) match {
+        createQuestion(pollType, pollQuestions(i).answers, pollQuestions(i).question, i, pollQuestions(i).multiResponse) match {
           case Some(question) => {
             questions(i) = question
           }
@@ -468,7 +467,6 @@ object PollFactory {
         }
       }
     }
-    println("Amar questions " + questions(0) + " LEN: " + questions.length)
     poll = Some(new Poll(id, questions, numRespondents, None))
     poll
   }
@@ -553,13 +551,14 @@ class Poll(val id: String, val questions: Array[Question], val numRespondents: I
   }
 
   def toSimplePollOutVO(): SimplePollOutVO = {
-    new SimplePollOutVO("0", questions(0).toSimpleAnswerOutVO(), questions(0).text)
+    new SimplePollOutVO("0", questions(0).toSimpleAnswerOutVO(), questions(0).text, false)
   }
 
   def toCustomPollOutVO(): CustomPollOutVO = {
     val customPoll = questions.zipWithIndex.map { case (q, index) => {
-      new SimplePollOutVO(index.toString, q.toSimpleAnswerOutVO(), q.text)
-    }}
+      new SimplePollOutVO(index.toString, q.toSimpleAnswerOutVO(), q.text, q.multiResponse)
+    }
+    }
     new CustomPollOutVO(id, customPoll)
   }
 

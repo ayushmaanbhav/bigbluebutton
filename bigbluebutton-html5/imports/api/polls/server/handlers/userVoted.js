@@ -2,22 +2,11 @@ import { check } from 'meteor/check';
 import updateVotes from '../modifiers/updateVotes';
 
 export default function userVoted({ body }, meetingId) {
-  const { poll } = body;
+  const { pollId, answersMap } = body;
 
   check(meetingId, String);
-  check(poll, {
-    id: String,
-    question: Match.OneOf(String, null, undefined),
-    answers: [
-      {
-        id: Number,
-        key: String,
-        numVotes: Number,
-      },
-    ],
-    numRespondents: Number,
-    numResponders: Number,
-  });
+  check(answersMap, Object);
 
-  return updateVotes(poll, meetingId);
+
+  return updateVotes(answersMap, pollId);
 }

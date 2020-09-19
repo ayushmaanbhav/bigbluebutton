@@ -44,10 +44,7 @@ const mapPolls = () => {
     pollExists: true,
     amIRequester,
     submitAnswers(pollId, answersMap) {
-      // console.log({ answersMap });
-      Object.keys(answersMap).forEach((key) => {
-        makeCall('publishVote', pollId, answersMap[key][0]);
-      });
+      makeCall('publishVote', pollId, answersMap);
     },
   };
 };

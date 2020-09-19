@@ -7,10 +7,12 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import _ from 'lodash';
 import { Session } from 'meteor/session';
 import Button from '/imports/ui/components/button/component';
-import { Input, Button as AntButton } from 'antd';
-import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
+import { Button as AntButton, Collapse, Input } from 'antd';
+import { CaretRightOutlined, PlusOutlined, QuestionOutlined } from '@ant-design/icons';
 import LiveResult from './live-result/component';
 import { styles } from './styles.scss';
+
+const { Panel } = Collapse;
 
 const { TextArea } = Input;
 
@@ -106,23 +108,22 @@ class Poll extends Component {
       customQuestion: '',
       customPoll: [
         {
-          question: 'Q1',
+          question: 'Magnesium ribbon is rubbed before burning because it has a coating of',
           answers: [
-            'A',
-            'B',
-            'C',
-            'D',
+            'basic magnesium carbonate',
+            'basic magnesium oxide',
+            'basic magnesium sulphide',
+            'basic magnesium chloride',
           ],
           multiResponse: false,
         },
         {
-          question: 'Q2',
+          question: 'Which of the following are exothermic processes?',
           answers: [
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
+            'Reaction of water with quick lime',
+            'Dilution of an acid',
+            'Evaporation of water',
+            'Sublimation of camphor (crystals)',
           ],
           multiResponse: true,
         },
@@ -244,7 +245,6 @@ class Poll extends Component {
         <Button
           onClick={() => {
             if (this.inputEditor.length > 0) {
-              // Session.set('pollInitiated', true);
               this.setState(prevState => ({
                 customPoll:
                   [...prevState.customPoll, {
@@ -284,26 +284,37 @@ class Poll extends Component {
   }
 
   renderCustomQuestionsView() {
-    // const { intl } = this.props;
     const { customPoll } = this.state;
-    const items = [];
+    const answers = [];
     customPoll.forEach((poll, pollIndex) => {
-      items.push(
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={`custom-poll-view${pollIndex}`} className={styles.pollQuestion}>
-          <h3>{poll.question}</h3>
+      answers.push(
+        <Panel
+          header={<><strong>{`Q${pollIndex + 1}: `}</strong> {`${poll.question}`}</>}
+          key={`Q${pollIndex + 1}`}
+          className="site-collapse-custom-panel"
+        >
           <ul>
-            {
-              poll.answers.map((ans, index) => (
-                // eslint-disable-next-line react/no-array-index-key
-                <li key={`ans${pollIndex}${index}`}>{ans}</li>
-              ))
-            }
+            {poll.answers.map((answer, index) => (
+              <li className={styles.answerItem} key={`ans${index + 1}`}>
+                <strong>{LiveResult.getAnswerIndexString(index)}</strong>
+                {answer}
+              </li>
+            ))}
           </ul>
-        </div>,
+        </Panel>,
       );
     });
-    return items;
+    return (
+      <Collapse
+        bordered={false}
+        accordion
+        defaultActiveKey={['Q1']}
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        className={styles.questionsCollapse}
+      >
+        {answers}
+      </Collapse>
+    );
   }
 
   renderInputFields() {
@@ -374,11 +385,11 @@ class Poll extends Component {
       isMeteorConnected,
       stopPoll,
       currentPoll,
-      pollAnswerIds,
       meetingName,
     } = this.props;
 
     if (!currentPoll) {
+      this.handleBackClick();
       return null;
     }
     return (
@@ -387,31 +398,16 @@ class Poll extends Component {
           {intl.formatMessage(intlMessages.activePollInstruction)}
         </div>
         {
-          currentPoll && currentPoll.questions ? currentPoll.questions.map(cp => (
-            <LiveResult
-              key={cp.id}
-              {...{
-                isMeteorConnected,
-                stopPoll,
-                cp,
-                pollAnswerIds,
-                meetingName,
-              }}
-              handleBackClick={this.handleBackClick}
-            />
-          )) : (
-            <LiveResult
-              key={currentPoll.id}
-              {...{
-                isMeteorConnected,
-                stopPoll,
-                currentPoll,
-                pollAnswerIds,
-                meetingName,
-              }}
-              handleBackClick={this.handleBackClick}
-            />
-          )
+          <LiveResult
+            key={currentPoll.id}
+            {...{
+              isMeteorConnected,
+              stopPoll,
+              currentPoll,
+              meetingName,
+            }}
+            handleBackClick={this.handleBackClick}
+          />
         }
       </div>
     );
@@ -495,21 +491,21 @@ class Poll extends Component {
             }}
           />
 
-          {/* <Button */}
-          {/*  label={intl.formatMessage(intlMessages.closeLabel)} */}
-          {/*  aria-label={`${intl.formatMessage(intlMessages.closeLabel)} ${intl.formatMessage(intlMessages.pollPaneTitle)}`} */}
-          {/*  onClick={() => { */}
-          {/*    if (currentPoll) { */}
-          {/*      stopPoll(); */}
-          {/*    } */}
-          {/*    Session.set('openPanel', 'userlist'); */}
-          {/*    Session.set('forcePollOpen', false); */}
-          {/*  }} */}
-          {/*  className={styles.closeBtn} */}
-          {/*  icon="close" */}
-          {/*  size="sm" */}
-          {/*  hideLabel */}
-          {/* /> */}
+          <Button
+            label={intl.formatMessage(intlMessages.closeLabel)}
+            aria-label={`${intl.formatMessage(intlMessages.closeLabel)} ${intl.formatMessage(intlMessages.pollPaneTitle)}`}
+            onClick={() => {
+              if (currentPoll) {
+                stopPoll();
+              }
+              Session.set('openPanel', 'userlist');
+              Session.set('forcePollOpen', false);
+            }}
+            className={styles.closeBtn}
+            icon="close"
+            size="sm"
+            hideLabel
+          />
 
         </header>
         {

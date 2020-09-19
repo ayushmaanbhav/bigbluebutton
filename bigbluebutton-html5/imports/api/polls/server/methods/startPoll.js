@@ -32,7 +32,6 @@ export default function startPoll(pollType, pollId, poll) {
       }],
     });
     payload.poll = poll;
-    // payload.timeLimit = 5; // mins
   }
   // console.log('StartPoll: ', {
   //   pollType,

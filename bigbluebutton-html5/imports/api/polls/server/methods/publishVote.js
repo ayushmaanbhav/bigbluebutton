@@ -4,7 +4,7 @@ import Polls from '/imports/api/polls';
 import Logger from '/imports/startup/server/logger';
 import { extractCredentials } from '/imports/api/common/server/helpers';
 
-export default function publishVote(id, pollAnswerId) { // TODO discuss location
+export default function publishVote(id, answersMap) { // TODO discuss location
   const REDIS_CONFIG = Meteor.settings.private.redis;
   const CHANNEL = REDIS_CONFIG.channels.toAkkaApps;
   const EVENT_NAME = 'RespondToPollReqMsg';
@@ -18,25 +18,22 @@ export default function publishVote(id, pollAnswerId) { // TODO discuss location
   const currentPoll = Polls.findOne({
     users: requesterUserId,
     meetingId,
-    'answers.id': pollAnswerId,
     id,
   });
 
-  check(pollAnswerId, Number);
+  check(answersMap, Object);
   check(currentPoll, Object);
   check(currentPoll.meetingId, String);
 
   const payload = {
     requesterId: requesterUserId,
     pollId: currentPoll.id,
-    questionId: 0,
-    answerId: pollAnswerId,
+    answersMap,
   };
 
   const selector = {
     users: requesterUserId,
     meetingId,
-    'answers.id': pollAnswerId,
   };
 
   const modifier = {
@@ -55,10 +52,6 @@ export default function publishVote(id, pollAnswerId) { // TODO discuss location
   };
 
   Polls.update(selector, modifier, cb);
-
-  // console.log({
-  //   payload, id, pollAnswerId, currentPoll,
-  // });
 
   return RedisPubSub.publishUserMessage(CHANNEL, EVENT_NAME, meetingId, requesterUserId, payload);
 }

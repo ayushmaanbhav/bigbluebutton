@@ -116,16 +116,13 @@ object Polls {
     }
   }
 
-  def handleRespondToPollReqMsg(requesterId: String, pollId: String, questionId: Int, answerId: Int,
-                                lm: LiveMeeting): Option[(String, SimplePollResultOutVO)] = {
-
+  def handleRespondToPollReqMsg(requesterId: String, pollId: String, answersMap: Map[String, Array[Int]],
+                                lm: LiveMeeting): Option[(String, Map[String, Array[Int]])] = {
     for {
       poll <- getSimplePollResult(pollId, lm.polls)
-      pvo <- handleRespondToPoll(poll, requesterId, pollId, questionId, answerId, lm)
     } yield {
-      (pollId, pvo)
+      (pollId, answersMap)
     }
-
   }
 
   def handleStartCustomPollReqMsg(state: MeetingState2x, requesterId: String, pollId: String, pollType: String,
@@ -482,7 +479,7 @@ case class ResponseOutVO(id: String, text: String, responders: Array[Responder] 
 
 case class QuestionOutVO(id: String, multiResponse: Boolean, question: String, responses: Array[ResponseOutVO])
 
-class Poll(val id: String, val questions: Array[Question], val numRespondents: Int, val title: Option[String]) {
+class Poll(val id: String, val questions: Array[Question], val numRespondents: Int, val title: Option[String], val metaData: Map[String, String] = Map("timeLimit" -> "10")) {
   private var _started: Boolean = false
   private var _stopped: Boolean = false
   private var _showResult: Boolean = false
@@ -547,7 +544,7 @@ class Poll(val id: String, val questions: Array[Question], val numRespondents: I
       qvos += q.toQuestionVO
     })
 
-    new PollVO(id, qvos.toArray, title, _started, _stopped, _showResult)
+    new PollVO(id, qvos.toArray, title, _started, _stopped, _showResult, metaData)
   }
 
   def toSimplePollOutVO(): SimplePollOutVO = {
@@ -559,7 +556,7 @@ class Poll(val id: String, val questions: Array[Question], val numRespondents: I
       new SimplePollOutVO(index.toString, q.toSimpleAnswerOutVO(), q.text, q.multiResponse)
     }
     }
-    new CustomPollOutVO(id, customPoll)
+    new CustomPollOutVO(id, customPoll, metaData)
   }
 
   def toSimplePollResultOutVO(): SimplePollResultOutVO = {

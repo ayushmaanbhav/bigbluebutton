@@ -83,6 +83,15 @@
   }
 }
 
+.answerItem {
+    list-style: none;
+}
+
+.questionsCollapse {
+    max-height: 50vh;
+    overflow: auto;
+}
+
 .header {
     position: relative;
     top: var(--poll-header-offset);

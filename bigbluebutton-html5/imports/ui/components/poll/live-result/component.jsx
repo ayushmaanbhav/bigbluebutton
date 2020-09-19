@@ -3,8 +3,12 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
+import { Collapse } from 'antd';
+import { CaretRightOutlined } from '@ant-design/icons';
 import { styles } from './styles';
 import Service from './service';
+
+const { Panel } = Collapse;
 
 const intlMessages = defineMessages({
   usersTitle: {
@@ -64,6 +68,11 @@ class LiveResult extends PureComponent {
     };
   }
 
+  static getAnswerIndexString(index) {
+    return `${String.fromCharCode(index + 97)}. `;
+  }
+
+
   static getUserAnswers(responses, users, answers) {
     const userAnswers = responses
       ? [...users, ...responses.map(u => u.userId)]
@@ -74,9 +83,16 @@ class LiveResult extends PureComponent {
       .map((user) => {
         let answer = '';
 
-        if (responses) {
-          const response = responses.find(r => r.userId === user.userId);
-          if (response) answer = answers[response.answerId].key;
+        if (responses && responses.find(r => r.userId === user.userId)) {
+          const { answersMap } = responses.find(r => r.userId === user.userId);
+          if (answersMap) {
+            Object.keys(answersMap)
+              .forEach((qid, qindex) => {
+                answer += `Q${qindex + 1}. ${answersMap[qid].sort()
+                  .map(aIndex => LiveResult.getAnswerIndexString(aIndex)
+                    .replace('.', '')).join(',')} `;
+              });
+          }
         }
 
         return {
@@ -90,65 +106,85 @@ class LiveResult extends PureComponent {
 
   static getDerivedStateFromProps(nextProps) {
     const {
-      currentPoll, intl, pollAnswerIds,
+      currentPoll,
     } = nextProps;
 
     if (!currentPoll) return null;
 
     const {
-      answers, responses, users, numRespondents,
+      questions, responses, users, responseTrack, answers,
     } = currentPoll;
 
-    const userAnswers = LiveResult.getUserAnswers(responses, users, answers)
-      .reduce((acc, user) => {
-        const formattedMessageIndex = user.answer.toLowerCase();
-        return ([
-          ...acc,
-          (
-            <tr key={_.uniqueId('stats-')}>
-              <td className={styles.resultLeft}>{user.name}</td>
-              <td className={styles.resultRight}>
-                {
-                  pollAnswerIds[formattedMessageIndex]
-                    ? intl.formatMessage(pollAnswerIds[formattedMessageIndex])
-                    : user.answer
-                }
-              </td>
-            </tr>
-          ),
-        ]);
-      }, []);
+    const userAnswers = LiveResult.getUserAnswers(responses, users, answers || questions['0'])
+      .reduce((acc, user) => ([
+        ...acc,
+        (
+          <tr key={_.uniqueId('stats-')}>
+            <td className={styles.resultLeft}>{user.name}</td>
+            <td className={styles.resultRight}>
+              {
+                user.answer
+              }
+            </td>
+          </tr>
+        ),
+      ]), []);
 
-    const pollStats = [];
+    const answerStats = [];
 
-    answers.map((obj) => {
-      const formattedMessageIndex = obj.key.toLowerCase();
-      const pct = Math.round(obj.numVotes / numRespondents * 100);
-      const pctFotmatted = `${Number.isNaN(pct) ? 0 : pct}%`;
+    responseTrack.forEach((response, index) => {
+      answerStats.push(
+        <Panel
+          header={<><strong>{`Q${index + 1}: `}</strong> {questions[index].question}</>}
+          key={`Q${index + 1}`}
+          className="questionView"
+        >
+          <ul>
+            {questions[index].answers.map((answer, aIndex) => (
+              <li className={styles.answerItem} key={`ans${aIndex + 1}`}>
+                <strong>{LiveResult.getAnswerIndexString(aIndex)}</strong>
+                {answer.key}
+              </li>
+            ))}
+          </ul>
+          <ul className={styles.statsPoll}>
+            {response.answers.map((obj, aindex) => {
+              const pct = responses ? Math.round(obj.numVotes / responses.length * 100) : 0;
+              const pctFotmatted = `${Number.isNaN(pct) ? 0 : pct}%`;
 
-      const calculatedWidth = {
-        width: pctFotmatted,
-      };
+              const calculatedWidth = {
+                width: pctFotmatted,
+              };
 
-      return pollStats.push(
-        <div className={styles.main} key={_.uniqueId('stats-')}>
-          <div className={styles.left}>
-            {
-              pollAnswerIds[formattedMessageIndex]
-                ? intl.formatMessage(pollAnswerIds[formattedMessageIndex])
-                : obj.key
-            }
-          </div>
-          <div className={styles.center}>
-            <div className={styles.barShade} style={calculatedWidth} />
-            <div className={styles.barVal}>{obj.numVotes || 0}</div>
-          </div>
-          <div className={styles.right}>
-            {pctFotmatted}
-          </div>
-        </div>,
+              return (
+                <div className={styles.main} key={_.uniqueId('stats-')}>
+                  <div className={styles.left}>
+                    {LiveResult.getAnswerIndexString(aindex)}
+                  </div>
+                  <div className={styles.center}>
+                    <div className={styles.barShade} style={calculatedWidth} />
+                    <div className={styles.barVal}>{obj.numVotes || 0}</div>
+                  </div>
+                  <div className={styles.right}>
+                    {pctFotmatted}
+                  </div>
+                </div>
+              );
+            })}
+          </ul>
+        </Panel>,
       );
     });
+    const pollStats = [
+      <Collapse
+        bordered={false}
+        defaultActiveKey={[]}
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        className={styles.questionsCollapse}
+      >
+        {answerStats}
+      </Collapse>];
+
 
     return {
       userAnswers,
@@ -251,16 +287,16 @@ class LiveResult extends PureComponent {
         {currentPoll
           ? (<>
             <div className={styles.alignCenter}>
-              <Button
-                disabled={!isMeteorConnected}
-                onClick={() => {
-                  Service.publishPoll();
-                  stopPoll();
-                }}
-                label={intl.formatMessage(intlMessages.publishLabel)}
-                color={waiting ? 'primary' : 'success'}
-                className={styles.btn}
-              />
+              {/* <Button */}
+              {/*  disabled={!isMeteorConnected} */}
+              {/*  onClick={() => { */}
+              {/*    Service.publishPoll(); */}
+              {/*    stopPoll(); */}
+              {/*  }} */}
+              {/*  label={intl.formatMessage(intlMessages.publishLabel)} */}
+              {/*  color={waiting ? 'primary' : 'success'} */}
+              {/*  className={styles.btn} */}
+              {/* /> */}
               <Button
                 disabled={!isMeteorConnected}
                 onClick={() => {

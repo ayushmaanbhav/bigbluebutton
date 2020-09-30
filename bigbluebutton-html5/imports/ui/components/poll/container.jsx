@@ -18,11 +18,11 @@ export default withTracker(() => {
 
   const currentSlide = PresentationAreaService.getCurrentSlide(currentPresentation.podId);
 
-  const startPoll = type => makeCall('startPoll', type, currentSlide.id);
+  const startPoll = type => makeCall('startPoll', type, 10, currentSlide.id);
 
-  const startCustomPoll = (type, poll) => makeCall('startPoll', type, currentSlide.id, {
+  const startCustomPoll = (type, poll) => makeCall('startPoll', type, poll.alarmTime, currentSlide.id, {
     id: currentSlide.id,
-    questions: poll,
+    questions: poll.questions,
   });
 
   return {

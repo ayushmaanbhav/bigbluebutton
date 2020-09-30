@@ -51,6 +51,7 @@ function polls() {
         id: 1,
         questions: 1,
         answers: 1,
+        timeLimit: 1,
       },
     });
   }

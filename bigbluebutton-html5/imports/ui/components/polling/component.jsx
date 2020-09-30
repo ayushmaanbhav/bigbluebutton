@@ -4,7 +4,12 @@ import Button from '/imports/ui/components/button/component';
 import injectWbResizeEvent from '/imports/ui/components/presentation/resize-wrapper/component';
 import { defineMessages, injectIntl } from 'react-intl';
 import cx from 'classnames';
+import { Statistic } from 'antd';
 import { styles } from './styles.scss';
+import LiveResult from '../poll/live-result/component';
+import { notify } from '../../services/notification';
+
+const { Countdown } = Statistic;
 
 const intlMessages = defineMessages({
   pollingTitleLabel: {
@@ -32,6 +37,7 @@ class Polling extends Component {
     }
     this.state = { pollAnswers: answers };
     this.play = this.play.bind(this);
+    this.onFinishAlarm = this.onFinishAlarm.bind(this);
   }
 
   componentDidMount() {
@@ -59,11 +65,10 @@ class Polling extends Component {
       return pollAnswers;
     });
     const { pollAnswers } = this.state;
-    console.log({
-      pollAnswers,
-      question,
-      pollAnswer,
-    });
+  }
+
+  onFinishAlarm() {
+    notify('The quiz time is over, please submit your answer!', 'info', 'desktop');
   }
 
   render() {
@@ -72,7 +77,6 @@ class Polling extends Component {
       intl,
       poll,
       submitAnswers,
-      pollAnswerIds,
     } = this.props;
 
     const { pollAnswers } = this.state;
@@ -93,21 +97,16 @@ class Polling extends Component {
       }];
     }
 
-    console.log({
-      allQuestions,
-      poll,
-      pollAnswers,
-    });
-
     const pollAnswerStyles = {
       [styles.pollingAnswers]: true,
       // [styles.removeColumns]: questions.length === 1,
       [styles.stacked]: stackOptions,
     };
 
+    const deadline = Date.now() + 1000 * 60 * poll.timeLimit;
+
     return (
       <div className={styles.overlay}>
-
         <div
           className={cx({
             [styles.pollingContainer]: true,
@@ -115,18 +114,16 @@ class Polling extends Component {
           })}
           role="alert"
         >
+          <Countdown format="mm:ss" title="Quiz ending in" value={deadline} onFinish={this.onFinishAlarm} />
           {
-            allQuestions.map(question => (<>
+            allQuestions.map((question, index) => (<>
               <div className={styles.pollingTitle}>
+                {<strong>{`Q${index + 1}: `}</strong>}
                 {question.question || intl.formatMessage(intlMessages.pollingTitleLabel)}
               </div>
               <div className={cx(pollAnswerStyles)}>
-                {question.answers.map((pollAnswer) => {
-                  const formattedMessageIndex = pollAnswer.key.toLowerCase();
-                  let label = pollAnswer.key;
-                  if (pollAnswerIds[formattedMessageIndex]) {
-                    label = intl.formatMessage(pollAnswerIds[formattedMessageIndex]);
-                  }
+                {question.answers.map((pollAnswer, aIndex) => {
+                  const label = `${LiveResult.getAnswerIndexString(aIndex)} ${pollAnswer.key}`;
 
                   return (
                     <div
@@ -141,8 +138,9 @@ class Polling extends Component {
                         label={label}
                         key={pollAnswer.key}
                         onClick={() => this.handleVote(question, pollAnswer)}
-                        aria-labelledby={`pollAnswerLabel${pollAnswer.key}`}
-                        aria-describedby={`pollAnswerDesc${pollAnswer.key}`}
+                        tooltipLabel={label}
+                        aria-labelledby={`pollAnswerLabel ${pollAnswer.id}`}
+                        aria-describedby={`pollAnswerDesc ${label}`}
                       />
                       <div
                         className={styles.hidden}
@@ -163,6 +161,7 @@ class Polling extends Component {
             </>))}
           <Button
             disabled={!isMeteorConnected}
+            style={{ textAlign: 'center', marginBottom: '20px' }}
             className={styles.pollingButton}
             color="primary"
             size="md"

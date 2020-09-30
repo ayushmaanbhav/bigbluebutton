@@ -3,12 +3,14 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
-import { Collapse } from 'antd';
+import { Collapse, Statistic } from 'antd';
 import { CaretRightOutlined } from '@ant-design/icons';
 import { styles } from './styles';
 import Service from './service';
+import { notify } from '../../../services/notification';
 
 const { Panel } = Collapse;
+const { Countdown } = Statistic;
 
 const intlMessages = defineMessages({
   usersTitle: {
@@ -69,11 +71,11 @@ class LiveResult extends PureComponent {
   }
 
   static getAnswerIndexString(index) {
-    return `${String.fromCharCode(index + 97)}. `;
+    return `${String.fromCharCode(index + 97).toUpperCase()}. `;
   }
 
 
-  static getUserAnswers(responses, users, answers) {
+  static getUserAnswers(responses, users) {
     const userAnswers = responses
       ? [...users, ...responses.map(u => u.userId)]
       : [...users];
@@ -112,8 +114,9 @@ class LiveResult extends PureComponent {
     if (!currentPoll) return null;
 
     const {
-      questions, responses, users, responseTrack, answers,
+      responses, users, responseTrack, answers,
     } = currentPoll;
+    let { questions } = currentPoll;
 
     const userAnswers = LiveResult.getUserAnswers(responses, users, answers || questions['0'])
       .reduce((acc, user) => ([
@@ -132,10 +135,14 @@ class LiveResult extends PureComponent {
 
     const answerStats = [];
 
+    if (!questions) {
+      questions = [{ question: 'Quick quiz', answers }];
+    }
+
     responseTrack.forEach((response, index) => {
       answerStats.push(
         <Panel
-          header={<><strong>{`Q${index + 1}: `}</strong> {questions[index].question}</>}
+          header={<><strong>{`Q${index + 1}: `}</strong> {questions && questions[index].question}</>}
           key={`Q${index + 1}`}
           className="questionView"
         >
@@ -178,7 +185,7 @@ class LiveResult extends PureComponent {
     const pollStats = [
       <Collapse
         bordered={false}
-        defaultActiveKey={[]}
+        defaultActiveKey={['Q1']}
         expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
         className={styles.questionsCollapse}
       >
@@ -209,6 +216,8 @@ class LiveResult extends PureComponent {
     let userCount = 0;
     let respondedCount = 0;
 
+    const deadline = Date.now() + 1000 * 60 * currentPoll.timeLimit;
+
     if (userAnswers) {
       userCount = userAnswers.length;
       userAnswers.map((user) => {
@@ -221,11 +230,6 @@ class LiveResult extends PureComponent {
       waiting = respondedCount !== userAnswers.length && currentPoll;
     }
 
-    let question = '';
-    if (currentPoll) {
-      question = currentPoll.question ? currentPoll.question : '';
-    }
-
     function downloadResults() {
       if (!currentPoll) {
         return;
@@ -233,11 +237,20 @@ class LiveResult extends PureComponent {
       const {
         answers, responses, users,
       } = currentPoll;
-      let csv = `Question:, ${question}\nAnswers:,${answers.map(x => x.key)
-        .join(',')}\nStudent, Student ID, Response\n`;
-      const allResponses = LiveResult.getUserAnswers(responses, users, answers);
-      allResponses.forEach((response) => {
-        csv += `${[response.name, response.userId, response.answer].join(',')}\n`;
+
+      let { questions } = currentPoll;
+      if (!questions) {
+        questions = [{ question: 'Quick quiz', answers }];
+      }
+      let csv = '';
+      const rollNumRex = /\[(.*)\]/g;
+      questions.forEach((question, index) => {
+        csv += `Question ${index + 1}:, ${question.question}\nAnswers:,${question.answers.map((x, aIndex) => LiveResult.getAnswerIndexString(aIndex) + x.key)
+          .join(',')}\nStudent, Student ID, Response\n`;
+        const allResponses = LiveResult.getUserAnswers(responses, users, question.answers);
+        allResponses.forEach((response) => {
+          csv += `${[response.name, rollNumRex.exec(response.name) && rollNumRex.exec(response.name)[1], response.answer].join(',')}\n`;
+        });
       });
       const blob = new Blob([csv], {
         type: 'text/csv;charset=utf-8;',
@@ -261,11 +274,14 @@ class LiveResult extends PureComponent {
       }
     }
 
+    function onFinishAlarm() {
+      notify('The quiz time is over you can finish the quiz now!', 'info', 'desktop');
+    }
+
     return (
       <div>
         <div className={styles.stats}>
-          {question ? <div className={styles.textCenter}><b>{question}</b></div> : null}
-          {question ? <br /> : null}
+          <Countdown format="mm:ss" title="Quiz ending in" value={deadline} onFinish={onFinishAlarm} />
           <div className={styles.statsSpan}>
             {pollStats}
           </div>
@@ -313,9 +329,8 @@ class LiveResult extends PureComponent {
                 disabled={!isMeteorConnected}
                 onClick={() => {
                   stopPoll();
-                  handleBackClick();
                 }}
-                label={waiting ? intl.formatMessage(intlMessages.cancelLabel) : intl.formatMessage(intlMessages.finishLabel)}
+                label={intl.formatMessage(intlMessages.finishLabel)}
                 color="danger"
                 className={styles.btn}
               />

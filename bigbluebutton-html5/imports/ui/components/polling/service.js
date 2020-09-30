@@ -28,6 +28,7 @@ const mapPolls = () => {
     currentPoll = {
       questions: poll.questions,
       pollId: poll.id,
+      timeLimit: poll.timeLimit,
       stackOptions,
     };
   } else {
@@ -35,6 +36,7 @@ const mapPolls = () => {
       answers: poll.answers,
       question: poll.question,
       pollId: poll.id,
+      timeLimit: poll.timeLimit,
       stackOptions,
     };
   }

@@ -71,7 +71,7 @@ export default function addPoll(meetingId, requesterId, poll) {
   }
   const currentPoll = poll;
   currentPoll.responseTrack = qTrack;
-  currentPoll.timeLimit = (poll.metaData && parseInt(poll.metaData.timeLimit, 10)) || 10;
+  currentPoll.timeLimit = (poll.metaData && parseInt(poll.metaData.timeLimit, 10)) || 5;
   delete currentPoll.metaData;
 
   const modifier = Object.assign(

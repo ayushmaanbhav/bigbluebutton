@@ -7,8 +7,12 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import _ from 'lodash';
 import { Session } from 'meteor/session';
 import Button from '/imports/ui/components/button/component';
-import { Button as AntButton, Collapse, Input } from 'antd';
-import { CaretRightOutlined, PlusOutlined, QuestionOutlined } from '@ant-design/icons';
+import {
+  Button as AntButton, Collapse, Input, InputNumber, Row, Col,
+} from 'antd';
+import {
+  CaretRightOutlined, PlusOutlined, QuestionOutlined, DeleteOutlined,
+} from '@ant-design/icons';
 import LiveResult from './live-result/component';
 import { styles } from './styles.scss';
 
@@ -106,28 +110,8 @@ class Poll extends Component {
       isPolling: false,
       customPollValues: [],
       customQuestion: '',
-      customPoll: [
-        {
-          question: 'Magnesium ribbon is rubbed before burning because it has a coating of',
-          answers: [
-            'basic magnesium carbonate',
-            'basic magnesium oxide',
-            'basic magnesium sulphide',
-            'basic magnesium chloride',
-          ],
-          multiResponse: false,
-        },
-        {
-          question: 'Which of the following are exothermic processes?',
-          answers: [
-            'Reaction of water with quick lime',
-            'Dilution of an acid',
-            'Evaporation of water',
-            'Sublimation of camphor (crystals)',
-          ],
-          multiResponse: true,
-        },
-      ],
+      alarmTime: 5,
+      customPoll: [],
       numOfQuizOptions: MAX_CUSTOM_FIELDS,
     };
 
@@ -141,6 +125,8 @@ class Poll extends Component {
     this.renderCustomQuestionsView = this.renderCustomQuestionsView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleBackClick = this.handleBackClick.bind(this);
+    this.deleteCustomQuestion = this.deleteCustomQuestion.bind(this);
+    this.handleChangeAlarm = this.handleChangeAlarm.bind(this);
   }
 
   componentDidMount() {
@@ -182,6 +168,10 @@ class Poll extends Component {
     this.setState({ customQuestion: this.customQuestion });
   }
 
+  handleChangeAlarm(timeLimit) {
+    this.setState({ alarmTime: timeLimit });
+  }
+
   handleBackClick() {
     const { stopPoll } = this.props;
     Session.set('resetPollPanel', false);
@@ -200,6 +190,12 @@ class Poll extends Component {
   toggleCustomFields() {
     const { customPollReq } = this.state;
     return this.setState({ customPollReq: !customPollReq });
+  }
+
+  deleteCustomQuestion(index) {
+    this.setState(prevState => ({
+      customPoll: prevState.customPoll.filter((__, i) => i !== index),
+    }));
   }
 
   renderQuickPollBtns() {
@@ -235,7 +231,7 @@ class Poll extends Component {
 
   renderCustomView() {
     const { intl, startCustomPoll } = this.props;
-    const { customPoll } = this.state;
+    const { customPoll, alarmTime } = this.state;
     const isDisabled = customPoll.length < 1;
     // Session.set('pollInitiated', true);
     // this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
@@ -260,17 +256,17 @@ class Poll extends Component {
               });
             }
           }}
-          label="Add Quiz"
+          label="Add Question"
           color="primary"
-          aria-disabled={isDisabled}
-          disabled={isDisabled}
+          aria-disabled={!this.inputEditor.length}
+          disabled={!this.inputEditor.length}
           className={styles.btn}
         />
         <Button
           onClick={() => {
             if (customPoll.length > 0) {
               Session.set('pollInitiated', true);
-              this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
+              this.setState({ isPolling: true }, () => startCustomPoll('custom', { questions: customPoll, alarmTime }));
             }
           }}
           label={intl.formatMessage(intlMessages.startCustomLabel)}
@@ -283,13 +279,17 @@ class Poll extends Component {
     );
   }
 
+
   renderCustomQuestionsView() {
     const { customPoll } = this.state;
     const answers = [];
     customPoll.forEach((poll, pollIndex) => {
       answers.push(
         <Panel
-          header={<><strong>{`Q${pollIndex + 1}: `}</strong> {`${poll.question}`}</>}
+          header={<><DeleteOutlined
+            className={styles.deleteQuestion}
+            onClick={() => this.deleteCustomQuestion(pollIndex)}
+          /><strong>{`Q${pollIndex + 1}: `}</strong> {`${poll.question}`} </>}
           key={`Q${pollIndex + 1}`}
           className="site-collapse-custom-panel"
         >
@@ -415,18 +415,37 @@ class Poll extends Component {
 
   renderPollOptions() {
     const { intl } = this.props;
+    const { customPoll, alarmTime } = this.state;
 
     return (
       <div>
-        <div className={styles.instructions}>
-          {intl.formatMessage(intlMessages.quickPollInstruction)}
-        </div>
-        <div className={styles.grid}>
-          {this.renderQuickPollBtns()}
-        </div>
+        {
+          customPoll.length > 0 ? null : <>
+            <div className={styles.instructions}>
+              {intl.formatMessage(intlMessages.quickPollInstruction)}
+            </div>
+            <div className={styles.grid}>
+              {this.renderQuickPollBtns()}
+            </div>
+          </>
+        }
         <div className={styles.instructions}>
           {intl.formatMessage(intlMessages.customPollInstruction)}
         </div>
+        <Row style={{ margin: '1em 0' }} align="middle">
+          <Col>
+            <p style={{ margin: '0 1em' }}>Alarm (In minutes): </p>
+          </Col>
+          <Col>
+            <InputNumber
+              aria-label="Alarm"
+              min={1}
+              max={60}
+              defaultValue={alarmTime}
+              onChange={this.handleChangeAlarm}
+            />
+          </Col>
+        </Row>
         {this.renderCustomQuestionsView()}
         {this.renderCustomView()}
       </div>

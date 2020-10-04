@@ -249,7 +249,14 @@ class LiveResult extends PureComponent {
           .join(',')}\nStudent, Student ID, Response\n`;
         const allResponses = LiveResult.getUserAnswers(responses, users, question.answers);
         allResponses.forEach((response) => {
-          csv += `${[response.name, rollNumRex.exec(response.name) && rollNumRex.exec(response.name)[1], response.answer].join(',')}\n`;
+          let { name } = response;
+          let rollNumber = '';
+          const rollNumberA = rollNumRex.exec(name);
+          if (rollNumberA !== null) {
+            rollNumber = rollNumberA[1].trim();
+          }
+          name = name.replace(`[${rollNumber}]`, '');
+          csv += `${[name, rollNumber, response.answer].join(',')}\n`;
         });
       });
       const blob = new Blob([csv], {

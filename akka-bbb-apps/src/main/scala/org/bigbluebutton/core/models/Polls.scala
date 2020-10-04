@@ -452,6 +452,7 @@ object PollFactory {
   def createCustomPoll(id: String, pollType: String, numRespondents: Int, polls: CustomPoll): Option[Poll] = {
     var poll: Option[Poll] = None
     var pollQuestions = polls.questions
+    var metaData = polls.metaData
     var questions = new Array[Question](pollQuestions.length)
 
     Array.tabulate(pollQuestions.length) {
@@ -464,7 +465,7 @@ object PollFactory {
         }
       }
     }
-    poll = Some(new Poll(id, questions, numRespondents, None))
+    poll = Some(new Poll(id, questions, numRespondents, None, metaData))
     poll
   }
 }

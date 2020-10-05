@@ -19,7 +19,10 @@
 
 package org.bigbluebutton.core.record.events
 
+import org.bigbluebutton.common2.domain.SimpleAnswerOutVO
+
 class UserRespondedToPollRecordEvent extends AbstractPollRecordEvent {
+
   import UserRespondedToPollRecordEvent._
 
   setEvent("UserRespondedToPollRecordEvent")
@@ -28,8 +31,9 @@ class UserRespondedToPollRecordEvent extends AbstractPollRecordEvent {
     eventMap.put(USER_ID, userId)
   }
 
-  def setAnswerId(answerId: Int) {
-    eventMap.put(ANSWER_ID, Integer.toString(answerId))
+  def setAnswerId(answerId: Map[String, Array[Int]]) {
+    eventMap.put(ANSWER_ID, answerId.map(_.productIterator.mkString(":"))
+      .mkString("|"))
   }
 }
 

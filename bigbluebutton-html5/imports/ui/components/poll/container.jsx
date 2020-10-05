@@ -1,7 +1,6 @@
 import React from 'react';
 import { makeCall } from '/imports/ui/services/api';
 import { withTracker } from 'meteor/react-meteor-data';
-import Auth from '/imports/ui/services/auth';
 import Presentations from '/imports/api/presentations';
 import PresentationAreaService from '/imports/ui/components/presentation/service';
 import Poll from '/imports/ui/components/poll/component';
@@ -19,9 +18,12 @@ export default withTracker(() => {
 
   const currentSlide = PresentationAreaService.getCurrentSlide(currentPresentation.podId);
 
-  const startPoll = type => makeCall('startPoll', type, currentSlide.id);
+  const startPoll = type => makeCall('startPoll', type, 10, currentSlide.id);
 
-  const startCustomPoll = (type, answers, question) => makeCall('startPoll', type, currentSlide.id, answers, question);
+  const startCustomPoll = (type, poll) => makeCall('startPoll', type, poll.alarmTime, currentSlide.id, {
+    id: currentSlide.id,
+    questions: poll.questions,
+  });
 
   return {
     currentSlide,

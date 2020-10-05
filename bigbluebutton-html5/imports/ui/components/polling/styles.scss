@@ -38,6 +38,9 @@
   background-color: var(--color-white);
   bottom: var(--jumbo-padding-x);
   right: var(--jumbo-padding-x);
+  max-width: 40vw;
+  max-height: 80vh;
+  overflow-y: auto;
 
   [dir="rtl"] & {
     left: var(--jumbo-padding-x);
@@ -59,7 +62,6 @@
 
 .pollingTitle {
   color: var(--color-text);
-  white-space: nowrap;
   padding-bottom: var(--md-padding-y);
   padding-top: var(--md-padding-y);
 }
@@ -72,12 +74,13 @@
 
 .pollingButton {
   width: 100%;
-  max-width: var(--max-btn-width);
+  border: 1px solid var(--color-primary);
+  text-align: left;
+  max-width: 20vw;
 
   @include mq($hasPhoneDimentions) {
     max-width: none;
   }
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -103,6 +106,9 @@
   }
 
   z-index: 1;
+  border-bottom: 1px solid #CFCFCF;
+  margin-bottom: 10px;
+  padding: 10px 0;
 }
 
 .stacked {

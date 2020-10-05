@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import Logger from '/imports/startup/server/logger';
 import Polls from '/imports/api/polls';
+import Users from '/imports/api/users';
 import { extractCredentials } from '/imports/api/common/server/helpers';
 
 function currentPoll() {
@@ -39,7 +40,21 @@ function polls() {
     meetingId,
     users: requesterUserId,
   };
-
+  const { role } = Users.findOne({
+    userId: requesterUserId,
+    approved: true,
+  });
+  if (role === 'VIEWER') {
+    return Polls.find(selector, {
+      fields: {
+        meetingId: 1,
+        id: 1,
+        questions: 1,
+        answers: 1,
+        timeLimit: 1,
+      },
+    });
+  }
   return Polls.find(selector);
 }
 

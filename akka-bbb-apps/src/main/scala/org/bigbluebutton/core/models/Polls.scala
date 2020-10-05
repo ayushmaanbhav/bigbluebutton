@@ -30,10 +30,10 @@ object Polls {
       stampedPollId: String = pageId + "/" + System.currentTimeMillis()
       numRespondents: Int = Users2x.numUsers(lm.users2x) - 1 // subtract the presenter
 
-      poll <- createPoll(stampedPollId, numRespondents)
+      poll <- createPoll(pollId, numRespondents)
       simplePoll <- getSimplePoll(poll.id, lm.polls)
     } yield {
-      startPoll(simplePoll.id, lm.polls)
+      startPoll(poll.id, lm.polls)
       simplePoll
     }
   }
@@ -116,24 +116,21 @@ object Polls {
     }
   }
 
-  def handleRespondToPollReqMsg(requesterId: String, pollId: String, questionId: Int, answerId: Int,
-                                lm: LiveMeeting): Option[(String, SimplePollResultOutVO)] = {
-
+  def handleRespondToPollReqMsg(requesterId: String, pollId: String, answersMap: Map[String, Array[Int]],
+                                lm: LiveMeeting): Option[(String, Map[String, Array[Int]])] = {
     for {
       poll <- getSimplePollResult(pollId, lm.polls)
-      pvo <- handleRespondToPoll(poll, requesterId, pollId, questionId, answerId, lm)
     } yield {
-      (pollId, pvo)
+      (pollId, answersMap)
     }
-
   }
 
   def handleStartCustomPollReqMsg(state: MeetingState2x, requesterId: String, pollId: String, pollType: String,
-                                  answers: Seq[String], questionText: String, lm: LiveMeeting): Option[SimplePollOutVO] = {
+                                  poll: CustomPoll, lm: LiveMeeting): Option[CustomPollOutVO] = {
 
-    def createPoll(pollId: String, numRespondents: Int): Option[Poll] = {
+    def createCustomPoll(pollId: String, numRespondents: Int): Option[Poll] = {
       for {
-        poll <- PollFactory.createPoll(pollId, pollType, numRespondents, Some(answers), Some(questionText))
+        poll <- PollFactory.createCustomPoll(pollId, pollType, numRespondents, poll)
       } yield {
         lm.polls.save(poll)
         poll
@@ -147,11 +144,11 @@ object Polls {
       pageId: String = if (pollId.contains("deskshare")) "deskshare" else page.id
       stampedPollId: String = pageId + "/" + System.currentTimeMillis()
       numRespondents: Int = Users2x.numUsers(lm.users2x) - 1 // subtract the presenter
-      poll <- createPoll(stampedPollId, numRespondents)
-      simplePoll <- getSimplePoll(stampedPollId, lm.polls)
+      poll <- createCustomPoll(stampedPollId, numRespondents)
+      customPoll <- getCustomPoll(stampedPollId, lm.polls)
     } yield {
       startPoll(poll.id, lm.polls)
-      simplePoll
+      customPoll
     }
   }
 
@@ -218,6 +215,7 @@ object Polls {
     } yield poll.toPollVO()
 
   }
+
   //
   //  def numPolls(polls: Polls): Int = {
   //    polls.size
@@ -264,6 +262,7 @@ object Polls {
         polls.currentPoll = Some(p)
     }
   }
+
   //
   //  def removePoll(pollID: String, model: PollModel): Boolean = {
   //    var success = false
@@ -289,6 +288,12 @@ object Polls {
   def getSimplePoll(pollId: String, polls: Polls): Option[SimplePollOutVO] = {
     var pvo: Option[SimplePollOutVO] = None
     polls.get(pollId) foreach (p => pvo = Some(p.toSimplePollOutVO()))
+    pvo
+  }
+
+  def getCustomPoll(pollId: String, polls: Polls): Option[CustomPollOutVO] = {
+    var pvo: Option[CustomPollOutVO] = None
+    polls.get(pollId) foreach (p => pvo = Some(p.toCustomPollOutVO()))
     pvo
   }
 
@@ -399,19 +404,19 @@ object PollFactory {
     ans
   }
 
-  private def processCustomPollType(qType: String, multiResponse: Boolean, answers: Option[Seq[String]], questionText: Option[String]): Option[Question] = {
+  private def processCustomPollType(qType: String, multiResponse: Boolean, answers: Option[Seq[String]], questionText: Option[String], qid: Int): Option[Question] = {
     var questionOption: Option[Question] = None
 
     answers.foreach { ans =>
       val someAnswers = buildAnswers(ans)
-      val question = new Question(0, PollType.CustomPollType, multiResponse, questionText, someAnswers)
+      val question = new Question(qid, PollType.CustomPollType, multiResponse, questionText, someAnswers)
       questionOption = Some(question)
     }
 
     questionOption
   }
 
-  private def createQuestion(qType: String, answers: Option[Seq[String]], questionText: Option[String]): Option[Question] = {
+  private def createQuestion(qType: String, answers: Option[Seq[String]], questionText: Option[String], qid: Int, multiResponse: Boolean = false): Option[Question] = {
 
     val qt = qType.toUpperCase()
     var questionOption: Option[Question] = None
@@ -421,7 +426,7 @@ object PollFactory {
     } else if (qt.matches(PollType.TrueFalsePollType)) {
       questionOption = Some(processTrueFalsePollType(qt))
     } else if (qt.matches(PollType.CustomPollType)) {
-      questionOption = processCustomPollType(qt, false, answers, questionText)
+      questionOption = processCustomPollType(qt, multiResponse, answers, questionText, qid)
     } else if (qt.startsWith(PollType.LetterPollType)) {
       questionOption = processLetterPollType(qt, false)
     } else if (qt.startsWith(PollType.NumberPollType)) {
@@ -434,7 +439,7 @@ object PollFactory {
   def createPoll(id: String, pollType: String, numRespondents: Int, answers: Option[Seq[String]], questionText: Option[String]): Option[Poll] = {
     var poll: Option[Poll] = None
 
-    createQuestion(pollType, answers, questionText) match {
+    createQuestion(pollType, answers, questionText, 0) match {
       case Some(question) => {
         poll = Some(new Poll(id, Array(question), numRespondents, None))
       }
@@ -443,30 +448,76 @@ object PollFactory {
 
     poll
   }
+
+  def createCustomPoll(id: String, pollType: String, numRespondents: Int, polls: CustomPoll): Option[Poll] = {
+    var poll: Option[Poll] = None
+    var pollQuestions = polls.questions
+    var metaData = polls.metaData
+    var questions = new Array[Question](pollQuestions.length)
+
+    Array.tabulate(pollQuestions.length) {
+      i => {
+        createQuestion(pollType, pollQuestions(i).answers, pollQuestions(i).question, i, pollQuestions(i).multiResponse) match {
+          case Some(question) => {
+            questions(i) = question
+          }
+          case None => None
+        }
+      }
+    }
+    poll = Some(new Poll(id, questions, numRespondents, None, metaData))
+    poll
+  }
 }
 
 case class QuestionResponsesVO(val questionID: String, val responseIDs: Array[String])
+
 case class PollResponseVO(val pollID: String, val responses: Array[QuestionResponsesVO])
+
 case class ResponderVO(responseID: String, user: Responder)
 
 case class ResponseOutVO(id: String, text: String, responders: Array[Responder] = Array[Responder]())
+
 case class QuestionOutVO(id: String, multiResponse: Boolean, question: String, responses: Array[ResponseOutVO])
 
-class Poll(val id: String, val questions: Array[Question], val numRespondents: Int, val title: Option[String]) {
+class Poll(val id: String, val questions: Array[Question], val numRespondents: Int, val title: Option[String], val metaData: Map[String, String] = Map("timeLimit" -> "10")) {
   private var _started: Boolean = false
   private var _stopped: Boolean = false
   private var _showResult: Boolean = false
   private var _numResponders: Int = 0
 
-  def showingResult() { _showResult = true }
-  def showResult(): Boolean = { _showResult }
-  def start() { _started = true }
-  def stop() { _stopped = true }
-  def isStarted(): Boolean = { return _started }
-  def isStopped(): Boolean = { return _stopped }
-  def isRunning(): Boolean = { return isStarted() && !isStopped() }
+  def showingResult() {
+    _showResult = true
+  }
+
+  def showResult(): Boolean = {
+    _showResult
+  }
+
+  def start() {
+    _started = true
+  }
+
+  def stop() {
+    _stopped = true
+  }
+
+  def isStarted(): Boolean = {
+    return _started
+  }
+
+  def isStopped(): Boolean = {
+    return _stopped
+  }
+
+  def isRunning(): Boolean = {
+    return isStarted() && !isStopped()
+  }
+
   def clear() {
-    questions.foreach(q => { q.clear })
+    questions.foreach(q => {
+      q.clear
+    })
     _started = false
     _stopped = false
   }
@@ -494,11 +545,19 @@ class Poll(val id: String, val questions: Array[Question], val numRespondents: I
       qvos += q.toQuestionVO
     })
 
-    new PollVO(id, qvos.toArray, title, _started, _stopped, _showResult)
+    new PollVO(id, qvos.toArray, title, _started, _stopped, _showResult, metaData)
   }
 
   def toSimplePollOutVO(): SimplePollOutVO = {
-    new SimplePollOutVO(id, questions(0).toSimpleAnswerOutVO(), questions(0).text)
+    new SimplePollOutVO("0", questions(0).toSimpleAnswerOutVO(), questions(0).text, false)
+  }
+
+  def toCustomPollOutVO(): CustomPollOutVO = {
+    val customPoll = questions.zipWithIndex.map { case (q, index) => {
+      new SimplePollOutVO(index.toString, q.toSimpleAnswerOutVO(), q.text, q.multiResponse)
+    }
+    }
+    new CustomPollOutVO(id, customPoll, metaData)
   }
 
   def toSimplePollResultOutVO(): SimplePollResultOutVO = {
@@ -562,6 +621,7 @@ class Answer(val id: Int, val key: String, val text: Option[String]) {
   def clear() {
     responders.clear
   }
+
   def addResponder(responder: Responder) {
     responders += responder
   }

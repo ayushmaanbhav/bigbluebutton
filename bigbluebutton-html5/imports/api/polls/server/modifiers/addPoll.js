@@ -7,16 +7,36 @@ import { check } from 'meteor/check';
 export default function addPoll(meetingId, requesterId, poll) {
   check(requesterId, String);
   check(meetingId, String);
-  check(poll, {
-    id: String,
-    question: Match.OneOf(String, null, undefined),
-    answers: [
-      {
-        id: Number,
-        key: String,
-      },
-    ],
-  });
+  if (poll.questions) {
+    check(poll, {
+      id: String,
+      questions: [{
+        id: String,
+        question: Match.OneOf(String, null, undefined),
+        answers: [
+          {
+            id: Number,
+            key: String,
+          },
+        ],
+        multiResponse: Boolean,
+      }],
+      metaData: Object,
+    });
+  } else {
+    check(poll, {
+      id: String,
+      question: Match.OneOf(String, null, undefined),
+      answers: [
+        {
+          id: Number,
+          key: String,
+        },
+      ],
+      multiResponse: Boolean,
+    });
+  }
+
 
   const userSelector = {
     meetingId,
@@ -34,16 +54,36 @@ export default function addPoll(meetingId, requesterId, poll) {
     id: poll.id,
   };
 
+  const { responseTrack } = poll;
+  let qTrack = responseTrack;
+  if (!qTrack) {
+    qTrack = poll.questions ? poll.questions : [{
+      id: poll.id,
+      answers: poll.answers,
+    }];
+    qTrack.forEach((q, index) => {
+      qTrack[index].answers = q.answers.map((a) => {
+        const x = a;
+        x.numVotes = 0;
+        return x;
+      });
+    });
+  }
+  const currentPoll = poll;
+  currentPoll.responseTrack = qTrack;
+  currentPoll.timeLimit = (poll.metaData && parseInt(poll.metaData.timeLimit, 10)) || 5;
+  delete currentPoll.metaData;
+
   const modifier = Object.assign(
     { meetingId },
     { requester: requesterId },
     { users: userIds },
-    flat(poll, { safe: true }),
+    flat(currentPoll, { safe: true }),
   );
 
   const cb = (err, numChanged) => {
     if (err != null) {
-      return Logger.error(`Adding Poll to collection: ${poll.id}`);
+      return Logger.error(`Error add Poll to collection: ${poll.id} ${err}`);
     }
 
     const { insertedId } = numChanged;

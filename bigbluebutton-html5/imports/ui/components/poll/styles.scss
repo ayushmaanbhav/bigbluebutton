@@ -75,12 +75,25 @@
   }
 }
 
+.deleteQuestion {
+    float: right;
+}
+
 .pollInput {
   > input {
     width: 100%;
     margin-top: var(--sm-padding-y);
     margin-bottom: var(--sm-padding-y);
   }
+}
+
+.answerItem {
+    list-style: none;
+}
+
+.questionsCollapse {
+    max-height: 50vh;
+    overflow: auto;
 }
 
 .header {

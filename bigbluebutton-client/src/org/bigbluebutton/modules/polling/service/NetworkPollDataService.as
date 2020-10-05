@@ -13,9 +13,9 @@ package org.bigbluebutton.modules.polling.service
 		this.sender = sender;
 	}
 
-    public function startCustomPoll(pollId:String, pollType: String, answers: Array):void
+    public function startCustomPoll(pollId:String, pollType: String, poll: Array):void
     {
-      sender.startCustomPoll(pollId, pollType, answers);
+      sender.startCustomPoll(pollId, pollType, poll);
     }
 
     public function startPoll(pollId:String, pollType: String):void

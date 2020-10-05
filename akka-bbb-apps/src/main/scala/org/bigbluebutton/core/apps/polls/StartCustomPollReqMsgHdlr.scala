@@ -1,6 +1,6 @@
 package org.bigbluebutton.core.apps.polls
 
-import org.bigbluebutton.common2.domain.SimplePollOutVO
+import org.bigbluebutton.common2.domain.{CustomPoll, CustomPollOutVO}
 import org.bigbluebutton.common2.msgs._
 import org.bigbluebutton.core.bus.MessageBus
 import org.bigbluebutton.core.domain.MeetingState2x
@@ -12,13 +12,13 @@ trait StartCustomPollReqMsgHdlr extends RightsManagementTrait {
   this: PollApp2x =>
 
   def handle(msg: StartCustomPollReqMsg, state: MeetingState2x, liveMeeting: LiveMeeting, bus: MessageBus): Unit = {
-    def broadcastEvent(msg: StartCustomPollReqMsg, poll: SimplePollOutVO): Unit = {
+    def broadcastEvent(msg: StartCustomPollReqMsg, poll: CustomPollOutVO): Unit = {
       val routing = Routing.addMsgToClientRouting(MessageTypes.BROADCAST_TO_MEETING, liveMeeting.props.meetingProp.intId, msg.header.userId)
-      val envelope = BbbCoreEnvelope(PollStartedEvtMsg.NAME, routing)
-      val header = BbbClientMsgHeader(PollStartedEvtMsg.NAME, liveMeeting.props.meetingProp.intId, msg.header.userId)
+      val envelope = BbbCoreEnvelope(CustomPollStartedEvtMsg.NAME, routing)
+      val header = BbbClientMsgHeader(CustomPollStartedEvtMsg.NAME, liveMeeting.props.meetingProp.intId, msg.header.userId)
 
-      val body = PollStartedEvtMsgBody(msg.header.userId, poll.id, poll)
-      val event = PollStartedEvtMsg(header, body)
+      val body = CustomPollStartedEvtMsgBody(msg.header.userId, poll.id, poll)
+      val event = CustomPollStartedEvtMsg(header, body)
       val msgEvent = BbbCommonEnvCoreMsg(envelope, event)
       bus.outGW.send(msgEvent)
     }
@@ -29,7 +29,7 @@ trait StartCustomPollReqMsgHdlr extends RightsManagementTrait {
       PermissionCheck.ejectUserForFailedPermission(meetingId, msg.header.userId, reason, bus.outGW, liveMeeting)
     } else {
       for {
-        pvo <- Polls.handleStartCustomPollReqMsg(state, msg.header.userId, msg.body.pollId, msg.body.pollType, msg.body.answers, msg.body.question, liveMeeting)
+        pvo <- Polls.handleStartCustomPollReqMsg(state, msg.header.userId, msg.body.pollId, msg.body.pollType, msg.body.poll, liveMeeting)
       } yield {
         broadcastEvent(msg, pvo)
       }

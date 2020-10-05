@@ -3,8 +3,14 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
+import { Collapse, Statistic } from 'antd';
+import { CaretRightOutlined } from '@ant-design/icons';
 import { styles } from './styles';
 import Service from './service';
+import { notify } from '../../../services/notification';
+
+const { Panel } = Collapse;
+const { Countdown } = Statistic;
 
 const intlMessages = defineMessages({
   usersTitle: {
@@ -64,7 +70,12 @@ class LiveResult extends PureComponent {
     };
   }
 
-  static getUserAnswers(responses, users, answers) {
+  static getAnswerIndexString(index) {
+    return `${String.fromCharCode(index + 97).toUpperCase()}. `;
+  }
+
+
+  static getUserAnswers(responses, users) {
     const userAnswers = responses
       ? [...users, ...responses.map(u => u.userId)]
       : [...users];
@@ -74,9 +85,16 @@ class LiveResult extends PureComponent {
       .map((user) => {
         let answer = '';
 
-        if (responses) {
-          const response = responses.find(r => r.userId === user.userId);
-          if (response) answer = answers[response.answerId].key;
+        if (responses && responses.find(r => r.userId === user.userId)) {
+          const { answersMap } = responses.find(r => r.userId === user.userId);
+          if (answersMap) {
+            Object.keys(answersMap)
+              .forEach((qid, qindex) => {
+                answer += `Q${qindex + 1}. ${answersMap[qid].sort()
+                  .map(aIndex => LiveResult.getAnswerIndexString(aIndex)
+                    .replace('.', '')).join(',')} `;
+              });
+          }
         }
 
         return {
@@ -90,65 +108,90 @@ class LiveResult extends PureComponent {
 
   static getDerivedStateFromProps(nextProps) {
     const {
-      currentPoll, intl, pollAnswerIds,
+      currentPoll,
     } = nextProps;
 
     if (!currentPoll) return null;
 
     const {
-      answers, responses, users, numRespondents,
+      responses, users, responseTrack, answers,
     } = currentPoll;
+    let { questions } = currentPoll;
 
-    const userAnswers = LiveResult.getUserAnswers(responses, users, answers)
-      .reduce((acc, user) => {
-        const formattedMessageIndex = user.answer.toLowerCase();
-        return ([
-          ...acc,
-          (
-            <tr key={_.uniqueId('stats-')}>
-              <td className={styles.resultLeft}>{user.name}</td>
-              <td className={styles.resultRight}>
-                {
-                  pollAnswerIds[formattedMessageIndex]
-                    ? intl.formatMessage(pollAnswerIds[formattedMessageIndex])
-                    : user.answer
-                }
-              </td>
-            </tr>
-          ),
-        ]);
-      }, []);
+    const userAnswers = LiveResult.getUserAnswers(responses, users, answers || questions['0'])
+      .reduce((acc, user) => ([
+        ...acc,
+        (
+          <tr key={_.uniqueId('stats-')}>
+            <td className={styles.resultLeft}>{user.name}</td>
+            <td className={styles.resultRight}>
+              {
+                user.answer
+              }
+            </td>
+          </tr>
+        ),
+      ]), []);
 
-    const pollStats = [];
+    const answerStats = [];
 
-    answers.map((obj) => {
-      const formattedMessageIndex = obj.key.toLowerCase();
-      const pct = Math.round(obj.numVotes / numRespondents * 100);
-      const pctFotmatted = `${Number.isNaN(pct) ? 0 : pct}%`;
+    if (!questions) {
+      questions = [{ question: 'Quick quiz', answers }];
+    }
 
-      const calculatedWidth = {
-        width: pctFotmatted,
-      };
+    responseTrack.forEach((response, index) => {
+      answerStats.push(
+        <Panel
+          header={<><strong>{`Q${index + 1}: `}</strong> {questions && questions[index].question}</>}
+          key={`Q${index + 1}`}
+          className="questionView"
+        >
+          <ul>
+            {questions[index].answers.map((answer, aIndex) => (
+              <li className={styles.answerItem} key={`ans${aIndex + 1}`}>
+                <strong>{LiveResult.getAnswerIndexString(aIndex)}</strong>
+                {answer.key}
+              </li>
+            ))}
+          </ul>
+          <ul className={styles.statsPoll}>
+            {response.answers.map((obj, aindex) => {
+              const pct = responses ? Math.round(obj.numVotes / responses.length * 100) : 0;
+              const pctFotmatted = `${Number.isNaN(pct) ? 0 : pct}%`;
 
-      return pollStats.push(
-        <div className={styles.main} key={_.uniqueId('stats-')}>
-          <div className={styles.left}>
-            {
-              pollAnswerIds[formattedMessageIndex]
-                ? intl.formatMessage(pollAnswerIds[formattedMessageIndex])
-                : obj.key
-            }
-          </div>
-          <div className={styles.center}>
-            <div className={styles.barShade} style={calculatedWidth} />
-            <div className={styles.barVal}>{obj.numVotes || 0}</div>
-          </div>
-          <div className={styles.right}>
-            {pctFotmatted}
-          </div>
-        </div>,
+              const calculatedWidth = {
+                width: pctFotmatted,
+              };
+
+              return (
+                <div className={styles.main} key={_.uniqueId('stats-')}>
+                  <div className={styles.left}>
+                    {LiveResult.getAnswerIndexString(aindex)}
+                  </div>
+                  <div className={styles.center}>
+                    <div className={styles.barShade} style={calculatedWidth} />
+                    <div className={styles.barVal}>{obj.numVotes || 0}</div>
+                  </div>
+                  <div className={styles.right}>
+                    {pctFotmatted}
+                  </div>
+                </div>
+              );
+            })}
+          </ul>
+        </Panel>,
       );
     });
+    const pollStats = [
+      <Collapse
+        bordered={false}
+        defaultActiveKey={['Q1']}
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        className={styles.questionsCollapse}
+      >
+        {answerStats}
+      </Collapse>];
+
 
     return {
       userAnswers,
@@ -173,6 +216,8 @@ class LiveResult extends PureComponent {
     let userCount = 0;
     let respondedCount = 0;
 
+    const deadline = Date.now() + 1000 * 60 * currentPoll.timeLimit;
+
     if (userAnswers) {
       userCount = userAnswers.length;
       userAnswers.map((user) => {
@@ -185,11 +230,6 @@ class LiveResult extends PureComponent {
       waiting = respondedCount !== userAnswers.length && currentPoll;
     }
 
-    let question = '';
-    if (currentPoll) {
-      question = currentPoll.question ? currentPoll.question : '';
-    }
-
     function downloadResults() {
       if (!currentPoll) {
         return;
@@ -197,11 +237,27 @@ class LiveResult extends PureComponent {
       const {
         answers, responses, users,
       } = currentPoll;
-      let csv = `Question:, ${question}\nAnswers:,${answers.map(x => x.key)
-        .join(',')}\nStudent, Student ID, Response\n`;
-      const allResponses = LiveResult.getUserAnswers(responses, users, answers);
-      allResponses.forEach((response) => {
-        csv += `${[response.name, response.userId, response.answer].join(',')}\n`;
+
+      let { questions } = currentPoll;
+      if (!questions) {
+        questions = [{ question: 'Quick quiz', answers }];
+      }
+      let csv = '';
+      const rollNumRex = /\[(.*)\]/g;
+      questions.forEach((question, index) => {
+        csv += `Question ${index + 1}:, ${question.question}\nAnswers:,${question.answers.map((x, aIndex) => LiveResult.getAnswerIndexString(aIndex) + x.key)
+          .join(',')}\nStudent, Student ID, Response\n`;
+        const allResponses = LiveResult.getUserAnswers(responses, users, question.answers);
+        allResponses.forEach((response) => {
+          let { name } = response;
+          let rollNumber = '';
+          const rollNumberA = rollNumRex.exec(name);
+          if (rollNumberA !== null) {
+            rollNumber = rollNumberA[1].trim();
+          }
+          name = name.replace(`[${rollNumber}]`, '');
+          csv += `${[name, rollNumber, response.answer].join(',')}\n`;
+        });
       });
       const blob = new Blob([csv], {
         type: 'text/csv;charset=utf-8;',
@@ -225,11 +281,14 @@ class LiveResult extends PureComponent {
       }
     }
 
+    function onFinishAlarm() {
+      notify('The quiz time is over you can finish the quiz now!', 'info', 'desktop');
+    }
+
     return (
       <div>
         <div className={styles.stats}>
-          {question ? <div className={styles.textCenter}><b>{question}</b></div> : null}
-          {question ? <br /> : null}
+          <Countdown format="mm:ss" title="Quiz ending in" value={deadline} onFinish={onFinishAlarm} />
           <div className={styles.statsSpan}>
             {pollStats}
           </div>
@@ -251,16 +310,16 @@ class LiveResult extends PureComponent {
         {currentPoll
           ? (<>
             <div className={styles.alignCenter}>
-              <Button
-                disabled={!isMeteorConnected}
-                onClick={() => {
-                  Service.publishPoll();
-                  stopPoll();
-                }}
-                label={intl.formatMessage(intlMessages.publishLabel)}
-                color={waiting ? 'primary' : 'success'}
-                className={styles.btn}
-              />
+              {/* <Button */}
+              {/*  disabled={!isMeteorConnected} */}
+              {/*  onClick={() => { */}
+              {/*    Service.publishPoll(); */}
+              {/*    stopPoll(); */}
+              {/*  }} */}
+              {/*  label={intl.formatMessage(intlMessages.publishLabel)} */}
+              {/*  color={waiting ? 'primary' : 'success'} */}
+              {/*  className={styles.btn} */}
+              {/* /> */}
               <Button
                 disabled={!isMeteorConnected}
                 onClick={() => {
@@ -277,9 +336,8 @@ class LiveResult extends PureComponent {
                 disabled={!isMeteorConnected}
                 onClick={() => {
                   stopPoll();
-                  handleBackClick();
                 }}
-                label={waiting ? intl.formatMessage(intlMessages.cancelLabel) : intl.formatMessage(intlMessages.finishLabel)}
+                label={intl.formatMessage(intlMessages.finishLabel)}
                 color="danger"
                 className={styles.btn}
               />

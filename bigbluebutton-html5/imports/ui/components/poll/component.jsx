@@ -7,10 +7,16 @@ import { withModalMounter } from '/imports/ui/components/modal/service';
 import _ from 'lodash';
 import { Session } from 'meteor/session';
 import Button from '/imports/ui/components/button/component';
-import { Input, Button as AntButton } from 'antd';
-import { PlusOutlined, QuestionOutlined } from '@ant-design/icons';
+import {
+  Button as AntButton, Collapse, Input, InputNumber, Row, Col,
+} from 'antd';
+import {
+  CaretRightOutlined, PlusOutlined, QuestionOutlined, DeleteOutlined,
+} from '@ant-design/icons';
 import LiveResult from './live-result/component';
 import { styles } from './styles.scss';
+
+const { Panel } = Collapse;
 
 const { TextArea } = Input;
 
@@ -101,10 +107,11 @@ class Poll extends Component {
     super(props);
 
     this.state = {
-      customPollReq: false,
       isPolling: false,
       customPollValues: [],
       customQuestion: '',
+      alarmTime: 5,
+      customPoll: [],
       numOfQuizOptions: MAX_CUSTOM_FIELDS,
     };
 
@@ -115,8 +122,11 @@ class Poll extends Component {
     this.renderQuickPollBtns = this.renderQuickPollBtns.bind(this);
     this.renderCustomView = this.renderCustomView.bind(this);
     this.renderInputFields = this.renderInputFields.bind(this);
+    this.renderCustomQuestionsView = this.renderCustomQuestionsView.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleBackClick = this.handleBackClick.bind(this);
+    this.deleteCustomQuestion = this.deleteCustomQuestion.bind(this);
+    this.handleChangeAlarm = this.handleChangeAlarm.bind(this);
   }
 
   componentDidMount() {
@@ -158,6 +168,10 @@ class Poll extends Component {
     this.setState({ customQuestion: this.customQuestion });
   }
 
+  handleChangeAlarm(timeLimit) {
+    this.setState({ alarmTime: timeLimit });
+  }
+
   handleBackClick() {
     const { stopPoll } = this.props;
     Session.set('resetPollPanel', false);
@@ -176,6 +190,12 @@ class Poll extends Component {
   toggleCustomFields() {
     const { customPollReq } = this.state;
     return this.setState({ customPollReq: !customPollReq });
+  }
+
+  deleteCustomQuestion(index) {
+    this.setState(prevState => ({
+      customPoll: prevState.customPoll.filter((__, i) => i !== index),
+    }));
   }
 
   renderQuickPollBtns() {
@@ -211,36 +231,42 @@ class Poll extends Component {
 
   renderCustomView() {
     const { intl, startCustomPoll } = this.props;
-    const { numOfQuizOptions } = this.state;
-    const isDisabled = _.compact(this.inputEditor).length < 1;
-
+    const { customPoll, alarmTime } = this.state;
+    const isDisabled = customPoll.length < 1;
+    // Session.set('pollInitiated', true);
+    // this.setState({ isPolling: true }, () => startCustomPoll('custom', customPoll));
     return (
       <div className={styles.customInputWrapper}>
         {this.renderInputFields()}
-        <div style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          margin: '1rem 0',
-        }}
-        >
-          <AntButton
-            type="dashed"
-            onClick={() => {
-              this.setState({ numOfQuizOptions: numOfQuizOptions + 1 });
-            }}
-            style={{ width: '80%' }}
-          >
-            <PlusOutlined />
-            {'Add answer'}
-          </AntButton>
-        </div>
-
         <Button
           onClick={() => {
             if (this.inputEditor.length > 0) {
+              this.setState(prevState => ({
+                customPoll:
+                  [...prevState.customPoll, {
+                    question: this.customQuestion,
+                    answers: _.compact(this.inputEditor),
+                    multiResponse: false,
+                  }],
+              }));
+              this.setState({
+                numOfQuizOptions: MAX_CUSTOM_FIELDS,
+                customPollValues: [],
+                customQuestion: '',
+              });
+            }
+          }}
+          label="Add Question"
+          color="primary"
+          aria-disabled={!this.inputEditor.length}
+          disabled={!this.inputEditor.length}
+          className={styles.btn}
+        />
+        <Button
+          onClick={() => {
+            if (customPoll.length > 0) {
               Session.set('pollInitiated', true);
-              this.setState({ isPolling: true }, () => startCustomPoll('custom', _.compact(this.inputEditor), this.customQuestion));
+              this.setState({ isPolling: true }, () => startCustomPoll('custom', { questions: customPoll, alarmTime }));
             }
           }}
           label={intl.formatMessage(intlMessages.startCustomLabel)}
@@ -250,6 +276,44 @@ class Poll extends Component {
           className={styles.btn}
         />
       </div>
+    );
+  }
+
+
+  renderCustomQuestionsView() {
+    const { customPoll } = this.state;
+    const answers = [];
+    customPoll.forEach((poll, pollIndex) => {
+      answers.push(
+        <Panel
+          header={<><DeleteOutlined
+            className={styles.deleteQuestion}
+            onClick={() => this.deleteCustomQuestion(pollIndex)}
+          /><strong>{`Q${pollIndex + 1}: `}</strong> {`${poll.question}`} </>}
+          key={`Q${pollIndex + 1}`}
+          className="site-collapse-custom-panel"
+        >
+          <ul>
+            {poll.answers.map((answer, index) => (
+              <li className={styles.answerItem} key={`ans${index + 1}`}>
+                <strong>{LiveResult.getAnswerIndexString(index)}</strong>
+                {answer}
+              </li>
+            ))}
+          </ul>
+        </Panel>,
+      );
+    });
+    return (
+      <Collapse
+        bordered={false}
+        accordion
+        defaultActiveKey={['Q1']}
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        className={styles.questionsCollapse}
+      >
+        {answers}
+      </Collapse>
     );
   }
 
@@ -292,7 +356,26 @@ class Poll extends Component {
           </div>
         );
       }));
-
+    items = items.concat(
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        margin: '1rem 0',
+      }}
+      >
+        <AntButton
+          type="dashed"
+          onClick={() => {
+            this.setState({ numOfQuizOptions: numOfQuizOptions + 1 });
+          }}
+          style={{ width: '80%' }}
+        >
+          <PlusOutlined />
+          {'Add answer'}
+        </AntButton>
+      </div>,
+    );
     return items;
   }
 
@@ -302,53 +385,69 @@ class Poll extends Component {
       isMeteorConnected,
       stopPoll,
       currentPoll,
-      pollAnswerIds,
       meetingName,
     } = this.props;
 
+    if (!currentPoll) {
+      this.handleBackClick();
+      return null;
+    }
     return (
       <div>
         <div className={styles.instructions}>
           {intl.formatMessage(intlMessages.activePollInstruction)}
         </div>
-        <LiveResult
-          {...{
-            isMeteorConnected,
-            stopPoll,
-            currentPoll,
-            pollAnswerIds,
-            meetingName,
-          }}
-          handleBackClick={this.handleBackClick}
-        />
+        {
+          <LiveResult
+            key={currentPoll.id}
+            {...{
+              isMeteorConnected,
+              stopPoll,
+              currentPoll,
+              meetingName,
+            }}
+            handleBackClick={this.handleBackClick}
+          />
+        }
       </div>
     );
   }
 
   renderPollOptions() {
-    const { isMeteorConnected, intl } = this.props;
-    const { customPollReq } = this.state;
+    const { intl } = this.props;
+    const { customPoll, alarmTime } = this.state;
 
     return (
       <div>
-        <div className={styles.instructions}>
-          {intl.formatMessage(intlMessages.quickPollInstruction)}
-        </div>
-        <div className={styles.grid}>
-          {this.renderQuickPollBtns()}
-        </div>
+        {
+          customPoll.length > 0 ? null : <>
+            <div className={styles.instructions}>
+              {intl.formatMessage(intlMessages.quickPollInstruction)}
+            </div>
+            <div className={styles.grid}>
+              {this.renderQuickPollBtns()}
+            </div>
+          </>
+        }
         <div className={styles.instructions}>
           {intl.formatMessage(intlMessages.customPollInstruction)}
         </div>
-        <Button
-          disabled={!isMeteorConnected}
-          className={styles.customBtn}
-          color="default"
-          onClick={this.toggleCustomFields}
-          label={intl.formatMessage(intlMessages.customPollLabel)}
-          aria-expanded={customPollReq}
-        />
-        {!customPollReq ? null : this.renderCustomView()}
+        <Row style={{ margin: '1em 0' }} align="middle">
+          <Col>
+            <p style={{ margin: '0 1em' }}>Alarm (In minutes): </p>
+          </Col>
+          <Col>
+            <InputNumber
+              aria-label="Alarm"
+              min={1}
+              max={60}
+              defaultValue={alarmTime}
+              onChange={this.handleChangeAlarm}
+            />
+          </Col>
+        </Row>
+        {this.renderCustomQuestionsView()}
+        {this.renderCustomView()}
       </div>
     );
   }

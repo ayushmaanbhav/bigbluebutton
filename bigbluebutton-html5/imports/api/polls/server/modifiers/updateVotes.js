@@ -3,30 +3,19 @@ import { check } from 'meteor/check';
 import Logger from '/imports/startup/server/logger';
 import flat from 'flat';
 
-export default function updateVotes(poll, meetingId) {
-  check(meetingId, String);
-  check(poll, Object);
-
-  const {
-    id,
-    answers,
-    numResponders,
-    numRespondents,
-  } = poll;
-
+export default function updateVotes(answerMap, id) {
   check(id, String);
-  check(answers, Array);
-
-  check(numResponders, Number);
-  check(numRespondents, Number);
+  check(answerMap, Object);
 
   const selector = {
-    meetingId,
     id,
   };
+  const currentPoll = Polls.findOne(selector);
+  const { numResponders } = currentPoll;
+  currentPoll.numResponders = numResponders ? numResponders + 1 : 1;
 
   const modifier = {
-    $set: flat(poll, { safe: true }),
+    $set: flat(currentPoll, { safe: true }),
   };
 
   const cb = (err) => {
@@ -34,7 +23,7 @@ export default function updateVotes(poll, meetingId) {
       return Logger.error(`Updating Polls collection: ${err}`);
     }
 
-    return Logger.info(`Updating Polls collection (meetingId: ${meetingId}, pollId: ${id}!)`);
+    return Logger.info(`Updating Polls collection (answerMap: ${answerMap}, pollId: ${id}!)`);
   };
 
   return Polls.update(selector, modifier, cb);

@@ -99,7 +99,7 @@ function getURLParameters() {
 };
 
 function getFullURL() {
-  let url = 'https://enlite-recordings.s3.us-west-002.backblazeb2.com/published/presentation/' + meetingId;
+  let url = 'https://enlite-recordings.s3.ap-south-1.amazonaws.com/presentation/' + meetingId;
   return url;
 };
 

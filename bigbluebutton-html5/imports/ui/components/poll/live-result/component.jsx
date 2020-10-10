@@ -118,7 +118,7 @@ class LiveResult extends PureComponent {
     } = currentPoll;
     let { questions } = currentPoll;
 
-    const userAnswers = LiveResult.getUserAnswers(responses, users, answers || questions['0'])
+    const userAnswers = LiveResult.getUserAnswers(responses, users)
       .reduce((acc, user) => ([
         ...acc,
         (
@@ -242,22 +242,29 @@ class LiveResult extends PureComponent {
       if (!questions) {
         questions = [{ question: 'Quick quiz', answers }];
       }
-      let csv = '';
+      let csv = `${meetingName}, ${(new Date()).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+      })}`;
       const rollNumRex = /\[(.*)\]/g;
       questions.forEach((question, index) => {
-        csv += `Question ${index + 1}:, ${question.question}\nAnswers:,${question.answers.map((x, aIndex) => LiveResult.getAnswerIndexString(aIndex) + x.key)
-          .join(',')}\nStudent, Student ID, Response\n`;
-        const allResponses = LiveResult.getUserAnswers(responses, users, question.answers);
-        allResponses.forEach((response) => {
-          let { name } = response;
-          let rollNumber = '';
-          const rollNumberA = rollNumRex.exec(name);
-          if (rollNumberA !== null) {
-            rollNumber = rollNumberA[1].trim();
-          }
-          name = name.replace(`[${rollNumber}]`, '');
-          csv += `${[name, rollNumber, response.answer].join(',')}\n`;
-        });
+        csv += `\nQuestion ${index + 1}:, ${question.question}\nAnswers:,${question.answers.map((x, aIndex) => LiveResult.getAnswerIndexString(aIndex) + x.key)
+          .join(',')}\n`;
+      });
+      csv += '\nStudent, Student ID, Response\n';
+      const allResponses = LiveResult.getUserAnswers(responses, users);
+      allResponses.forEach((response) => {
+        let { name } = response;
+        let rollNumber = '';
+        const rollNumberA = rollNumRex.exec(name);
+        if (rollNumberA !== null) {
+          rollNumber = rollNumberA[1].trim();
+        }
+        name = name.replace(`[${rollNumber}]`, '');
+        csv += `${[name, rollNumber, response.answer].join(',')}\n`;
       });
       const blob = new Blob([csv], {
         type: 'text/csv;charset=utf-8;',

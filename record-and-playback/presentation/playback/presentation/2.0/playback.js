@@ -18,7 +18,7 @@
 */
 
 const defaultCopyright = '<p>Recorded with <a target="_blank" href="https://enlite.in/">Enlite</a>.</p><p>Use <a target="_blank" href="http://mozilla.org/firefox">Mozilla Firefox</a> or <a target="_blank" href="http://google.com/chrome/">Google Chrome</a> to play this recording.</p>';
-const defaultLogo = 'logo.png';
+const defaultLogo = 'logo.svg';
 
 // Playback events
 var dataReady = false;

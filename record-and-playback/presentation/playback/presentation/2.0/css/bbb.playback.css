@@ -117,7 +117,7 @@ br{
 }
 
 #slide {
-	background-image: url('../logo.png');
+	background-image: url('../logo.svg');
 	text-align: center;
 	border: 0px solid #ccc;
 	width: 800px;

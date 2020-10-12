@@ -143,10 +143,10 @@ class JoinHandler extends Component {
     const setModOnlyMessage = (resp) => {
       if (resp && resp.modOnlyMessage) {
         const sanitizedModOnlyText = SanitizeHTML(resp.modOnlyMessage, {
-          allowedTags: ['b', 'strong', 'i', 'u', 'a', 'br', 'img'],
+          allowedTags: ['a', 'b', 'br', 'i', 'img', 'li', 'small', 'span', 'strong', 'u', 'ul'],
           allowedAttributes: {
             a: ['href', 'name', 'target'],
-            img: ['src'],
+            img: ['src', 'width', 'height'],
           },
           allowedSchemes: ['https'],
         });
@@ -178,6 +178,7 @@ class JoinHandler extends Component {
     const { response } = parseToJson;
 
     setLogoutURL(response);
+    logUserInfo();
 
     if (response.returncode !== 'FAILED') {
       await setAuth(response);
@@ -185,7 +186,6 @@ class JoinHandler extends Component {
       setBannerProps(response);
       setLogoURL(response);
       setModOnlyMessage(response);
-      logUserInfo();
 
       Tracker.autorun(async (cd) => {
         const user = Users.findOne({ userId: Auth.userID, approved: true }, { fields: { _id: 1 } });

@@ -16,13 +16,21 @@ const intlMessages = defineMessages({
     id: 'app.video.leaveVideo',
     description: 'Leave video button label',
   },
-  videoButtonDesc: {
-    id: 'app.video.videoButtonDesc',
-    description: 'video button description',
-  },
   videoLocked: {
     id: 'app.video.videoLocked',
     description: 'video disabled label',
+  },
+  videoConnecting: {
+    id: 'app.video.connecting',
+    description: 'video connecting label',
+  },
+  dataSaving: {
+    id: 'app.video.dataSaving',
+    description: 'video data saving label',
+  },
+  meteorDisconnected: {
+    id: 'app.video.clientDisconnected',
+    description: 'Meteor disconnected label',
   },
   iOSWarning: {
     id: 'app.iOSWarning.label',
@@ -33,14 +41,13 @@ const intlMessages = defineMessages({
 const propTypes = {
   intl: intlShape.isRequired,
   hasVideoStream: PropTypes.bool.isRequired,
-  isDisabled: PropTypes.bool.isRequired,
   mountVideoPreview: PropTypes.func.isRequired,
 };
 
 const JoinVideoButton = ({
   intl,
   hasVideoStream,
-  isDisabled,
+  disableReason,
   mountVideoPreview,
 }) => {
   const exitVideo = () => hasVideoStream && !VideoService.isMultipleCamerasEnabled();
@@ -57,23 +64,24 @@ const JoinVideoButton = ({
     }
   };
 
-  const label = exitVideo() ?
-    intl.formatMessage(intlMessages.leaveVideo) :
-    intl.formatMessage(intlMessages.joinVideo);
+  let label = exitVideo()
+    ? intl.formatMessage(intlMessages.leaveVideo)
+    : intl.formatMessage(intlMessages.joinVideo);
+
+  if (disableReason) label = intl.formatMessage(intlMessages[disableReason]);
 
   return (
     <Button
-      label={isDisabled ? intl.formatMessage(intlMessages.videoLocked) : label}
+      label={label}
       className={cx(styles.button, hasVideoStream || styles.btn)}
       onClick={handleOnClick}
       hideLabel
-      aria-label={intl.formatMessage(intlMessages.videoButtonDesc)}
       color={hasVideoStream ? 'primary' : 'default'}
       icon={hasVideoStream ? 'video' : 'video_off'}
       ghost={!hasVideoStream}
       size="lg"
       circle
-      disabled={isDisabled}
+      disabled={!!disableReason}
     />
   );
 };

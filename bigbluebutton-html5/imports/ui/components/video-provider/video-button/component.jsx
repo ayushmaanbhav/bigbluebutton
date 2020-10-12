@@ -5,6 +5,7 @@ import Button from '/imports/ui/components/button/component';
 import { defineMessages, injectIntl, intlShape } from 'react-intl';
 import VideoService from '../service';
 import { styles } from './styles';
+import { validIOSVersion } from '/imports/ui/components/app/service';
 
 const intlMessages = defineMessages({
   joinVideo: {
@@ -22,6 +23,18 @@ const intlMessages = defineMessages({
   videoLocked: {
     id: 'app.video.videoLocked',
     description: 'video disabled label',
+  },
+  videoConnecting: {
+    id: 'app.video.connecting',
+    description: 'video connecting label',
+  },
+  dataSaving: {
+    id: 'app.video.dataSaving',
+    description: 'video data saving label',
+  },
+  meteorDisconnected: {
+    id: 'app.video.clientDisconnected',
+    description: 'Meteor disconnected label',
   },
   iOSWarning: {
     id: 'app.iOSWarning.label',
@@ -42,14 +55,14 @@ const JoinVideoButton = ({
   isDisabled,
   validIOSVersion,
   className,
+  disableReason,
   mountVideoPreview,
 }) => {
   const exitVideo = () => hasVideoStream && !VideoService.isMultipleCamerasEnabled();
 
   const handleOnClick = () => {
     if (!validIOSVersion()) {
-      VideoService.notify(intl.formatMessage(intlMessages.iOSWarning));
-      return;
+      return VideoService.notify(intl.formatMessage(intlMessages.iOSWarning));
     }
 
     if (exitVideo()) {
@@ -59,14 +72,16 @@ const JoinVideoButton = ({
     }
   };
 
-  const label = exitVideo()
+  let label = exitVideo()
     ? intl.formatMessage(intlMessages.leaveVideo)
     : intl.formatMessage(intlMessages.joinVideo);
+
+  if (disableReason) label = intl.formatMessage(intlMessages[disableReason]);
 
   return (
     <Button
       label={isDisabled ? intl.formatMessage(intlMessages.videoLocked) : label}
-      className={cx(styles.button, hasVideoStream || styles.btn, className)}
+      className={cx(styles.button, hasVideoStream || styles.btn)}
       onClick={handleOnClick}
       hideLabel
       aria-label={intl.formatMessage(intlMessages.videoButtonDesc)}
@@ -75,7 +90,7 @@ const JoinVideoButton = ({
       ghost={!hasVideoStream}
       size="lg"
       circle
-      disabled={isDisabled || !navigator.mediaDevices}
+      disabled={!!disableReason || !navigator.mediaDevices}
     />
   );
 };

@@ -10,6 +10,7 @@ import LiveResult from '../poll/live-result/component';
 import { notify } from '../../services/notification';
 
 const { Countdown } = Statistic;
+import AudioService from '/imports/ui/components/audio/service';
 
 const intlMessages = defineMessages({
   pollingTitleLabel: {
@@ -45,8 +46,9 @@ class Polling extends Component {
   }
 
   play() {
-    this.alert = new Audio(`${Meteor.settings.public.app.cdn + Meteor.settings.public.app.basename}/resources/sounds/Poll.mp3`);
-    this.alert.play();
+    AudioService.playAlertSound(`${Meteor.settings.public.app.cdn
+      + Meteor.settings.public.app.basename}`
+      + '/resources/sounds/Poll.mp3');
   }
 
   handleVote(question, pollAnswer) {

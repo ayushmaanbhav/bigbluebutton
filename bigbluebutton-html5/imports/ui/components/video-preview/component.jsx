@@ -569,8 +569,7 @@ class VideoPreview extends Component {
                             key: profile.id,
                             label: `${intlMessages[`${profile.id}`]
                               ? intl.formatMessage(intlMessages[`${profile.id}`])
-                              : profile.name} ${profile.id === 'hd' ? '' : intl.formatMessage(intlMessages.qualityLabel)
-                              .toLowerCase()}`,
+                              : profile.name}`,
                           }
                         ))
                     }

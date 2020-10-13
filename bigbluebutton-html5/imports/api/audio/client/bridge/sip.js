@@ -28,8 +28,8 @@ const CALL_CONNECT_TIMEOUT = 20000;
 const ICE_NEGOTIATION_TIMEOUT = 20000;
 const AUDIO_SESSION_NUM_KEY = 'AudioSessionNumber';
 const USER_AGENT_RECONNECTION_ATTEMPTS = 3;
-const USER_AGENT_RECONNECTION_DELAY_MS = 5000;
-const USER_AGENT_CONNECTION_TIMEOUT_MS = 5000;
+const USER_AGENT_RECONNECTION_DELAY_MS = 1000;
+const USER_AGENT_CONNECTION_TIMEOUT_MS = 1000;
 
 const getAudioSessionNumber = () => {
   let currItem = parseInt(sessionStorage.getItem(AUDIO_SESSION_NUM_KEY), 10);
@@ -838,7 +838,7 @@ export default class SIPBridge extends BaseAudioBridge {
     window.clientLogger = logger;
   }
 
-  get inputDeviceId () {
+  get inputDeviceId() {
     return this.media.inputDevice ? this.media.inputDevice.inputDeviceId : null;
   }
 

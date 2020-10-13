@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { defineMessages, injectIntl } from 'react-intl';
 import Button from '/imports/ui/components/button/component';
-import { Collapse, Statistic } from 'antd';
+import { Collapse, Popconfirm, Statistic } from 'antd';
 import { CaretRightOutlined } from '@ant-design/icons';
 import { styles } from './styles';
 import Service from './service';
@@ -339,15 +339,27 @@ class LiveResult extends PureComponent {
               />
             </div>
             <div className={styles.alignCenter}>
-              <Button
-                disabled={!isMeteorConnected}
-                onClick={() => {
+              <Popconfirm
+                title={(
+                  <p>
+                    {'Finishing quiz will delete all the responses.'}
+                    <br />
+                    {'Do you want to finish this quiz?'}
+                  </p>
+)}
+                onConfirm={() => {
                   stopPoll();
                 }}
-                label={intl.formatMessage(intlMessages.finishLabel)}
-                color="danger"
-                className={styles.btn}
-              />
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  disabled={!isMeteorConnected}
+                  label={intl.formatMessage(intlMessages.finishLabel)}
+                  color="danger"
+                  className={styles.btn}
+                />
+              </Popconfirm>
             </div>
             </>
           ) : (

@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { RightOutlined, TeamOutlined } from '@ant-design/icons';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Session } from 'meteor/session';
-import { Badge, Button } from 'antd';
+import { Badge, Button as AntButton } from 'antd';
 import { styles } from './styles.scss';
 import DesktopShare from './desktop-share/component';
 import ActionsDropdown from './actions-dropdown/component';
@@ -15,6 +15,8 @@ import CaptionsButtonContainer from '/imports/ui/components/actions-bar/captions
 import PresentationOptionsContainer from './presentation-options/component';
 import withShortcutHelper from '../shortcut-help/service';
 import { withModalMounter } from '../modal/service';
+import EndMeetingConfirmationContainer from '../end-meeting-confirmation/container';
+import Button from '/imports/ui/components/button/component';
 
 const intlMessages = defineMessages({
   toggleUserListLabel: {
@@ -28,6 +30,14 @@ const intlMessages = defineMessages({
   newMessages: {
     id: 'app.navBar.toggleUserList.newMessages',
     description: 'label for toggleUserList btn when showing red notification',
+  },
+  endMeetingLabel: {
+    id: 'app.navBar.settingsDropdown.endMeetingLabel',
+    description: 'End meeting options label',
+  },
+  endMeetingDesc: {
+    id: 'app.navBar.settingsDropdown.endMeetingDesc',
+    description: 'Describes settings option closing the current meeting',
   },
 });
 
@@ -85,6 +95,7 @@ class ActionsBar extends PureComponent {
       isExpanded,
       shortcuts: TOGGLE_USERLIST_AK,
       hasUnreadMessages,
+      mountModal,
     } = this.props;
 
     const actionBarClasses = {};
@@ -133,6 +144,20 @@ class ActionsBar extends PureComponent {
           }
         </div>
         <div className={cx(actionBarClasses)}>
+          {amIModerator ? (
+            <Button
+              className={cx(styles.hiddenControls)}
+              onClick={() => mountModal(<EndMeetingConfirmationContainer />)}
+              hideLabel
+              aria-label={intl.formatMessage(intlMessages.endMeetingDesc)}
+              label={intl.formatMessage(intlMessages.endMeetingDesc)}
+              color="danger"
+              icon="application"
+              size="lg"
+              circle
+            />
+          ) : null}
+
           <AudioControlsContainer className={styles.hiddenControls} />
           {enableVideo && amIModerator
             ? (
@@ -155,7 +180,7 @@ class ActionsBar extends PureComponent {
             }}
           />
           <Badge dot={hasUnreadMessages}>
-            <Button
+            <AntButton
               className={styles.antBtnWithShadow}
               data-test="userListToggleButton"
               label={intl.formatMessage(intlMessages.toggleUserListLabel)}

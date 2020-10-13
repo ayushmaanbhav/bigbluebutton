@@ -84,7 +84,7 @@ class AuthenticatedHandler extends Component {
     } = this.state;
 
     Session.set('isMeetingEnded', false);
-    Session.set('isPollOpen', false);
+    Session.set('isPollOpen', true);
     // TODO: breakoutRoomIsOpen doesn't seem used
     Session.set('breakoutRoomIsOpen', false);
 

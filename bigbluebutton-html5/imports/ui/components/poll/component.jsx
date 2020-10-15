@@ -105,13 +105,20 @@ const MAX_INPUT_CHARS = 500;
 class Poll extends Component {
   constructor(props) {
     super(props);
+    let questions = [];
+    try {
+      questions = JSON.parse(this.getQuestions('questions'));
+    } catch (e) {
+      questions = [];
+    }
+
 
     this.state = {
       isPolling: false,
       customPollValues: [],
       customQuestion: '',
       alarmTime: 5,
-      customPoll: [],
+      customPoll: questions,
       numOfQuizOptions: MAX_CUSTOM_FIELDS,
     };
 
@@ -128,6 +135,7 @@ class Poll extends Component {
     this.deleteCustomQuestion = this.deleteCustomQuestion.bind(this);
     this.handleChangeAlarm = this.handleChangeAlarm.bind(this);
   }
+
 
   componentDidMount() {
     const { props } = this.hideBtn;
@@ -148,6 +156,22 @@ class Poll extends Component {
       Session.set('openPanel', 'userlist');
       Session.set('forcePollOpen', false);
     }
+  }
+
+  getQuestions(cname) {
+    const name = `${cname}=`;
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return '';
   }
 
   handleInputChange(index, event) {
